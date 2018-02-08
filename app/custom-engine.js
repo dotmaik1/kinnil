@@ -257,13 +257,22 @@ module.exports = function(io) {
                             
                             // TA, TM, Disponibillidad Real, Sin disponibilidad Meta. Agrupado por maquina
                             // TODO: A todos los queries hay que quitar los enters y \ porque traducidos se ven asi select e.maquinas_id maquina, \t\t\t\tsum(e.valor) piezas, \t\t\t\tsum(e.tiempo) tiempo, \t\t\t\tsum(e.valor)...
-                            var result = connection.query("select maquinas_id, sum(case when activo=1 then tiempo else 0 end) ta, \
+                            var result = connection.query("select maquinas_id, \
+                            sum(case when activo=1 then tiempo else 0 end) ta, \
                             sum(case when activo=0 then tiempo else 0 end) tm, \
                             (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
                             from eventos2 e \
-                            where e.fecha = CAST('" + fecha + "' as date) \
-                            and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                            and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            where CASE \
+                                    when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                                    then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                    ELSE \
+                                        CASE \
+                                        when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                            then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                            ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                                    OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                        END \
+                                    END \
                             group by maquinas_id") 
                             return result
                         }).then(function(rows){
@@ -306,8 +315,17 @@ module.exports = function(io) {
                             (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
                             from eventos2 e \
                             inner join productos p on e.productos_id = p.id \
-                            where e.fecha = CAST('" + fecha + "' as date) \
-                            AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) AND e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            where CASE \
+                            when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                ELSE \
+                                    CASE \
+                                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                    END \
+                                END \
                             group by p.id, e.maquinas_id) sub \
                             group by maquina") 
                             return result
@@ -324,9 +342,17 @@ module.exports = function(io) {
                             sum(case when e.razones_calidad_id = 1 then e.valor else 0 end) * 100 / sum(e.valor) / p.calidad calidad \
                             from eventos2 e \
                             inner join productos p on e.productos_id = p.id \
-                            where e.fecha = CAST('" + fecha + "' as date) \
-                            and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                            and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            where CASE \
+                                when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                                then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                ELSE \
+                                    CASE \
+                                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                    END \
+                                END \
                             group by p.calidad, e.maquinas_id) sub \
                             group by maquina")
         
@@ -404,13 +430,22 @@ module.exports = function(io) {
                     
                     // TA, TM, Disponibillidad Real, Sin disponibilidad Meta. Agrupado por maquina
                     // TODO: A todos los queries hay que quitar los enters y \ porque traducidos se ven asi select e.maquinas_id maquina, \t\t\t\tsum(e.valor) piezas, \t\t\t\tsum(e.tiempo) tiempo, \t\t\t\tsum(e.valor)...
-                    var result = connection.query("select maquinas_id, sum(case when activo=1 then tiempo else 0 end) ta, \
+                    var result = connection.query("select maquinas_id, \
+                    sum(case when activo=1 then tiempo else 0 end) ta, \
                     sum(case when activo=0 then tiempo else 0 end) tm, \
                     (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
                     from eventos2 e \
-                    where e.fecha = CAST('" + fecha + "' as date) \
-                    and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                    and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                    where CASE \
+                            when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                            ELSE \
+                                CASE \
+                                when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                    then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                    ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                            OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                END \
+                            END \
                     group by maquinas_id") 
                     return result
                 }).then(function(rows){
@@ -453,8 +488,17 @@ module.exports = function(io) {
                     (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
                     from eventos2 e \
                     inner join productos p on e.productos_id = p.id \
-                    where e.fecha = CAST('" + fecha + "' as date) \
-                    AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) AND e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                    where CASE \
+                    when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                    then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                        ELSE \
+                            CASE \
+                            when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                        OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                            END \
+                        END \
                     group by p.id, e.maquinas_id) sub \
                     group by maquina") 
                     return result
@@ -471,9 +515,17 @@ module.exports = function(io) {
                     sum(case when e.razones_calidad_id = 1 then e.valor else 0 end) * 100 / sum(e.valor) / p.calidad calidad \
                     from eventos2 e \
                     inner join productos p on e.productos_id = p.id \
-                    where e.fecha = CAST('" + fecha + "' as date) \
-                    and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                    and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                    where CASE \
+                        when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                        then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                        ELSE \
+                            CASE \
+                            when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                        OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                            END \
+                        END \
                     group by p.calidad, e.maquinas_id) sub \
                     group by maquina")
 
@@ -903,13 +955,22 @@ module.exports = function(io) {
                             
                             // TA, TM, Disponibillidad Real, Sin disponibilidad Meta. Agrupado por maquina
                             // TODO: A todos los queries hay que quitar los enters y \ porque traducidos se ven asi select e.maquinas_id maquina, \t\t\t\tsum(e.valor) piezas, \t\t\t\tsum(e.tiempo) tiempo, \t\t\t\tsum(e.valor)...
-                            var result = connection.query("select maquinas_id, sum(case when activo=1 then tiempo else 0 end) ta, \
+                            var result = connection.query("select maquinas_id, \
+                            sum(case when activo=1 then tiempo else 0 end) ta, \
                             sum(case when activo=0 then tiempo else 0 end) tm, \
                             (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
                             from eventos2 e \
-                            where e.fecha = CAST('" + fecha + "' as date) \
-                            and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                            and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            where CASE \
+                                    when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                                    then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                    ELSE \
+                                        CASE \
+                                        when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                            then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                            ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                                    OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                        END \
+                                    END \
                             group by maquinas_id") 
                             return result
                         }).then(function(rows){
@@ -952,8 +1013,17 @@ module.exports = function(io) {
                             (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
                             from eventos2 e \
                             inner join productos p on e.productos_id = p.id \
-                            where e.fecha = CAST('" + fecha + "' as date) \
-                            AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) AND e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            where CASE \
+                            when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                ELSE \
+                                    CASE \
+                                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                    END \
+                                END \
                             group by p.id, e.maquinas_id) sub \
                             group by maquina") 
                             return result
@@ -970,9 +1040,17 @@ module.exports = function(io) {
                             sum(case when e.razones_calidad_id = 1 then e.valor else 0 end) * 100 / sum(e.valor) / p.calidad calidad \
                             from eventos2 e \
                             inner join productos p on e.productos_id = p.id \
-                            where e.fecha = CAST('" + fecha + "' as date) \
-                            and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                            and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                            where CASE \
+                                when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                                then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                ELSE \
+                                    CASE \
+                                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                                    END \
+                                END \
                             group by p.calidad, e.maquinas_id) sub \
                             group by maquina")
         

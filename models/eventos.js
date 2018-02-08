@@ -30,8 +30,6 @@ exports.getDashboard = function(done) {
         // TODO: Hay que ver si es factible sacar el codigo de abajo fuera de la conexion para que este mas limpio todo
         var today = new Date();
         var dd = today.getDate();
-
-        console.log(today)
         
         var mm = today.getMonth()+1; 
         var yyyy = today.getFullYear();
@@ -54,8 +52,8 @@ exports.getDashboard = function(done) {
         fecha = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('YYYY-MM-DD')
         hora = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('HH:mm:ss')
 
-        console.log(fecha)
-        console.log(hora)
+        log.info(fecha)
+        log.info(hora)
 
         // TODO: Hacer algo!!! -> Se muestra la ultima informacion guardada en la DB (activo/inactivo) Pero de eso pudo haber pasado mucho rato si no se ha agregado un cambio nuevo (necesitare agregar algo que verifique el ultimo estatus?????)
         // Turno actual, nos va a servir para obtener la informacion del turno en cuestion
@@ -70,21 +68,32 @@ exports.getDashboard = function(done) {
                         WHERE \
                             CASE WHEN inicio <= fin THEN inicio <= evento AND fin >= evento \
                             ELSE inicio <= evento OR fin >= evento END \
-                        AND activo = 1;")
+                        AND activo = 1")
+
         .then(function(rows){
             return_data.turnoActual = rows
             
             // TODO: A todos estos queries hay que agregar la opcion para que vean el turno de 3ra para que no fallen
             // TA, TM, Disponibillidad Real, Sin disponibilidad Meta. Agrupado por maquina
             // TODO: A todos los queries hay que quitar los enters y \ porque traducidos se ven asi select e.maquinas_id maquina, \t\t\t\tsum(e.valor) piezas, \t\t\t\tsum(e.tiempo) tiempo, \t\t\t\tsum(e.valor)...
-            var result = connection.query("select maquinas_id, sum(case when activo=1 then tiempo else 0 end) ta, \
+            var result = connection.query("select maquinas_id, \
+            sum(case when activo=1 then tiempo else 0 end) ta, \
             sum(case when activo=0 then tiempo else 0 end) tm, \
             (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
             from eventos2 e \
-            where e.fecha = CAST('" + fecha + "' as date) \
-            and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-            and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+            where CASE \
+                    when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                    then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                    ELSE \
+                        CASE \
+                        when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                            then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                            ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                    OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                        END \
+                    END \
             group by maquinas_id") 
+
             return result
         }).then(function(rows){
             return_data.disponibilidad = rows
@@ -131,8 +140,17 @@ exports.getDashboard = function(done) {
             (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
             from eventos2 e \
             inner join productos p on e.productos_id = p.id \
-            where e.fecha = CAST('" + fecha + "' as date) \
-            AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) AND e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+            where CASE \
+            when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+            then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                ELSE \
+                    CASE \
+                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                    END \
+                END \
             group by p.id, e.maquinas_id) sub \
             group by maquina") 
             return result
@@ -148,12 +166,21 @@ exports.getDashboard = function(done) {
             sum(case when e.razones_calidad_id = 1 then e.valor else 0 end) * 100 / sum(e.valor) / p.calidad calidad \
             from eventos2 e \
             inner join productos p on e.productos_id = p.id \
-            where e.fecha = CAST('" + fecha + "' as date) \
-            and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-            and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+            where CASE \
+                when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
+                then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                ELSE \
+                    CASE \
+                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
+                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
+                    END \
+                END \
             group by p.calidad, e.maquinas_id) sub \
             group by maquina")
             
+
             return result
         }).then(function(rows){ 
             return_data.calidad = rows
