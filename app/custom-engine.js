@@ -604,7 +604,7 @@ module.exports = function(io) {
             var horaFin = json.horaFin // Este valor es recibido en segundos.
             var tipo = json.tipo // hora | producto | turno.
 
-            var where = " WHERE (e.fecha > '" + inicio + "' AND e.fecha < '" + fin + "') "
+            var where = " WHERE (e.fecha >= '" + inicio + "' AND e.fecha <= '" + fin + "') "
 
             // Si las planta no es "todas" se filtra tambien por planta ID
             if (planta != "all")
@@ -638,8 +638,6 @@ module.exports = function(io) {
                 
                 var today = new Date();
                 var dd = today.getDate();
-        
-                console.log(today)
                 
                 var mm = today.getMonth()+1; 
                 var yyyy = today.getFullYear();
@@ -656,12 +654,10 @@ module.exports = function(io) {
                 var m = d.getMinutes()
                 var s = d.getSeconds()
                 var horaActual = h + ":" + m + ":" + s
-                console.log(horaActual)
         
                 fecha = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('YYYY-MM-DD')
                 hora = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('HH:mm:ss')
                 
-                console.log(fecha + " " + hora)
         
                 connection.query(turnosQuery)
                 .then(function(rows){
@@ -738,7 +734,6 @@ module.exports = function(io) {
                     // Parece que funciona igual al de arriba. Hay que probarlo en desarrollo
                     promisePool.releaseConnection(connection);
         
-                    console.log(return_data)
                     // Emite el evento que es recibido por el cliente (que lo pidio?) para graficarlo TODO: Revisar esta parte del socket (quienes los reciben)
                     io.emit('reporte-oee', return_data); // io.emit send a message to everione connected
                     

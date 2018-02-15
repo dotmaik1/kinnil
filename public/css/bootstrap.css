@@ -7333,9 +7333,10 @@ footer {
 /*
 * Table striped cambia el color para el diseño que me pasaron
 */
-.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+/* Se quito este estilo porque interviene con el color de los eventos */
+/*.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
   background-color: #CCCCCC;
-}
+}*/
 
 
 @font-face {
