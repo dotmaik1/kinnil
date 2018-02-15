@@ -735,7 +735,7 @@ module.exports = function(io) {
                     promisePool.releaseConnection(connection);
         
                     // Emite el evento que es recibido por el cliente (que lo pidio?) para graficarlo TODO: Revisar esta parte del socket (quienes los reciben)
-                    io.emit('reporte-oee', return_data); // io.emit send a message to everione connected
+                    socket.emit('reporte-oee', return_data); // io.emit send a message to everione connected
                     
                     
                 }).catch(function(err) {
