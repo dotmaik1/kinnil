@@ -10,17 +10,14 @@
         <div class="modal-body">
             <div class="form-group">
                 <!-- TODO: agregar validacion y limpieza de caracteres para no guardar en la base de datos basura -->
-                <label for="message" class="h4 ">Nombre</label>
+                <!-- TODO: hacer algo con el sqlinjection -->
+                <label for="nombreAddPlanta" class="h4 ">Nombre</label>
                 <input id="nombreAddPlanta" class="form-control" rows="5" required></input>
             </div>
-            <!--<div class="form-group">
-                <label for="message" class="h4 ">Notas</label>
-                <input id="notasAddPlanta" class="form-control" rows="5"></input>
-            </div>-->
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-plantas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -39,11 +36,11 @@
     <form role="form" id="addAreasForm">
         <div class="modal-body">
             <div class="form-group">
-                <label for="nombreArea" class="h4 ">Nombre</label>
+                <label for="nombreAddAreas" class="h4 ">Nombre</label>
                 <input id="nombreAddAreas" class="form-control" rows="5" required></input>
             </div>
             <div class="form-group">
-                <label for="message" class="h4 ">Notas</label>
+                <label for="plantaId" class="h4 ">Notas</label>
                 <select id="plantaId" class="form-control" >
                     <% if(plantas.length>0){%>
                     <% for(var i=0; i<plantas.length; i++) {%>
@@ -57,7 +54,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-areas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -77,11 +74,11 @@
     <form role="form" id="addMaquinasForm">
         <div class="modal-body">
             <div class="form-group">
-                <label for="message" class="h4 ">Nombre</label>
+                <label for="nombreAddMaquinas" class="h4 ">Nombre</label>
                 <input id="nombreAddMaquinas" class="form-control" rows="5" required></input>
             </div>
             <div class="form-group">
-                <label for="message" class="h4 ">Area</label>
+                <label for="idAreaAddMaquinas" class="h4 ">Area</label>
                 <select id="idAreaAddMaquinas" class="form-control" required>
                     <% if(areas.length>0){%>
                     <% for(var i=0; i<areas.length; i++) {%>
@@ -93,7 +90,7 @@
                 </select>
             </div>
             <div class="form-group">
-                    <label for="message" class="h4 ">Producto</label>
+                    <label for="idProductoAddMaquinas" class="h4 ">Producto</label>
                     <select id="idProductoAddMaquinas" class="form-control" required>
                         <% if(productos.length>0){%>
                         <% for(var i=0; i<productos.length; i++) {%>
@@ -103,15 +100,11 @@
                             <option value = "sinarea">No hay productos.</option>
                         <% } %>
                     </select>
-                </div><!--
-            <div class="form-group">
-                <label for="message" class="h4 ">Notas</label>
-                <input id="message" class="form-control" rows="5"></input>
-            </div>-->
+                </div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-maquinas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -119,7 +112,6 @@
 </div><!-- /.modal -->
 
 <!-- Modal Agregar Razones de paro -->
-<!-- TODO: Las razones de calidad y de paro tienen que estar ligadas a una maquina y hay que penzar si se agregan por default -->
 <div class="modal fade" id="addRazonesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 <div class="modal-dialog">
     <div class="modal-content">
@@ -127,16 +119,28 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title" id="myModalLabel">Agregar una razon de paro</h4>
     </div>
-    <form role="form" id="contactForm">
+    <form role="form" id="addRazonesParoForm">
         <div class="modal-body">
             <div class="form-group">
-                <label for="message" class="h4 ">Nombre</label>
-                <input id="message" class="form-control" rows="5" required></input>
+                <label for="nombreAddRazonesParo" class="h4 ">Nombre</label>
+                <input id="nombreAddRazonesParo" class="form-control" rows="5" required></input>
+            </div>
+            <div class="form-group">
+                <label for="idMaquinaAddRazonesParo" class="h4 ">Maquina</label>
+                <select id="idMaquinaAddRazonesParo" class="form-control" required>
+                    <% if(maquinas.length>0){%>
+                    <% for(var i=0; i<maquinas.length; i++) {%>
+                    <option value = "<%= maquinas[i].id %>"><%= maquinas[i].nombre %></option>
+                    <% } %>
+                    <%} else {%>
+                        <option value = "sinarea">No hay maquinas.</option>
+                    <% } %>
+                </select>
             </div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-maquinas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -144,7 +148,6 @@
 </div><!-- /.modal -->
 
 <!-- Modal Agregar Razones de calidad -->
-<!-- TODO: Las razones de calidad y de paro tienen que estar ligadas a una maquina y hay que penzar si se agregan por default -->
 <div class="modal fade" id="addCalidadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 <div class="modal-dialog">
     <div class="modal-content">
@@ -152,16 +155,28 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title" id="myModalLabel">Agregar una razon de calidad</h4>
     </div>
-    <form role="form" id="contactForm">
+    <form role="form" id="addRazonesCalidadForm">
         <div class="modal-body">
             <div class="form-group">
-                <label for="message" class="h4 ">Nombre</label>
-                <input id="message" class="form-control" rows="5" required></input>
+                <label for="nombreAddRazonesCalidad" class="h4 ">Nombre</label>
+                <input id="nombreAddRazonesCalidad" class="form-control" rows="5" required></input>
+            </div>
+            <div class="form-group">
+                <label for="idMaquinaAddRazonesCalidad" class="h4 ">Maquina</label>
+                <select id="idMaquinaAddRazonesCalidad" class="form-control" required>
+                    <% if(maquinas.length>0){%>
+                    <% for(var i=0; i<maquinas.length; i++) {%>
+                    <option value = "<%= maquinas[i].id %>"><%= maquinas[i].nombre %></option>
+                    <% } %>
+                    <%} else {%>
+                        <option value = "sinarea">No hay maquinas.</option>
+                    <% } %>
+                </select>
             </div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-maquinas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -213,7 +228,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-maquinas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -255,7 +270,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-maquinas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->
@@ -304,7 +319,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="add-maquinas-submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
     </div><!-- /.modal-content -->

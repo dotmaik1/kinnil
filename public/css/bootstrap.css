@@ -7012,7 +7012,7 @@ dl {
 }
 
 .btn.btn-signin {
-    /*background-color: #4d90fe; */
+    *background-color: #1E4D9D;
     /*background-color: rgb(104, 145, 162);
     / background-color: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));*/
     padding: 0px;
@@ -7052,19 +7052,51 @@ dl {
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 }
 
+
+
 /*
 * Tabs de la pagina configuracion
 */
 
-.nav-tabs { border-bottom: 2px solid #DDD; }
-.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover { border-width: 0; }
-.nav-tabs > li > a { border: none; color: #666; }
-    .nav-tabs > li.active > a, .nav-tabs > li > a:hover { border: none; color: #4285F4 !important; background: transparent; }
-    .nav-tabs > li > a::after { content: ""; background: #4285F4; height: 2px; position: absolute; width: 100%; left: 0px; bottom: -1px; transition: all 250ms ease 0s; transform: scale(0); }
-.nav-tabs > li.active > a::after, .nav-tabs > li:hover > a::after { transform: scale(1); }
-.tab-nav > li > a::after { background: #21527d none repeat scroll 0% 0%; color: #fff; }
-.tab-pane { padding: 15px 0; }
-.tab-content{padding:20px}
+.nav-tabs { 
+  border-bottom: 2px solid #DDD; 
+}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover { 
+  border-width: 0; 
+}
+.nav-tabs > li > a { 
+  border: none; 
+  color: #666; 
+}
+.nav-tabs > li.active > a, .nav-tabs > li > a:hover { 
+  border: none; 
+  color: #253F72 !important; 
+  background: transparent; 
+}
+.nav-tabs > li > a::after { 
+  /*content: "";*/  /* TODO: Hay que hacer algo porque esta linea le da estilo a los demas, ahora se estan metiendo la pata */  
+  background: #253F72; 
+  height: 2px; 
+  position: absolute; 
+  width: 100%; 
+  left: 0px; 
+  bottom: -1px; 
+  transition: all 250ms ease 0s; 
+  transform: scale(0); 
+}
+.nav-tabs > li.active > a::after, .nav-tabs > li:hover > a::after { 
+  transform: scale(1); 
+}
+.tab-nav > li > a::after { 
+  background: #21527d none repeat scroll 0% 0%; 
+  color: #fff; 
+}
+.tab-pane { 
+  padding: 15px 0; 
+}
+.tab-content{
+  padding:20px
+}
 
 
 
@@ -7138,6 +7170,180 @@ dl {
 
 
 /*
-* Fix para bootstrap 3 para imprimir
+* Custom layout desing
 */
 
+.btn-primary {
+  color: #fff;
+  background-color: #1E4D9D;
+  border-color: #1E4D9D;
+  border-radius: 10px;
+}
+
+.btn.btn-signin {
+    padding: 0px;
+    font-weight: 700;
+    font-size: 14px;
+    height: 50px;
+    width: 160px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 10px;
+    border: none;
+    -o-transition: all 0.218s;
+    -moz-transition: all 0.218s;
+    -webkit-transition: all 0.218s;
+    transition: all 0.218s;
+}
+
+.card {
+  background-color: #E6E7E9;
+  padding: 20px 25px 30px;
+  margin: 0 auto 25px;
+  margin-top: 50px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 16px;
+  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+/*
+* Panel superior con los logotipos
+*/
+.logo {
+  height: 114px;
+  background-color: #fff;
+}
+
+/*
+* Clases para las pestañas del menu principal
+*/
+.panel.with-nav-tabs .panel-heading{
+  padding: 5px 5px 0 5px;
+}
+.panel.with-nav-tabs .nav-tabs{
+border-bottom: none;
+}
+.panel.with-nav-tabs .nav-justified{
+margin-bottom: -1px;
+}
+
+/********************************************************************/
+/*** PANEL PRIMARY ***/
+.with-nav-tabs.panel-primary .nav-tabs > li > a,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+    color: #fff;
+}
+.with-nav-tabs.panel-primary .nav-tabs > .open > a,
+.with-nav-tabs.panel-primary .nav-tabs > .open > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > .open > a:focus,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li > a:focus {
+	color: #fff;
+	background-color: #3071a9;
+	border-color: transparent;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a,
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.active > a:focus {
+	color: #253F72;
+	background-color: #EDEDED;
+	border-color: #428bca;
+	border-bottom-color: transparent;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu {
+    background-color: #428bca;
+    border-color: #3071a9;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a {
+    color: #253F72;   
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > li > a:focus {
+    background-color: #3071a9;
+}
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a,
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:hover,
+.with-nav-tabs.panel-primary .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
+    background-color: #4a9fe9;
+}
+
+/*
+* Botones transparentes 
+*/
+.btn-primary-outline {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.btn-primary-outline:hover {
+  cursor: pointer;
+  background-color: #3071a9;
+  border-color: #3071a9;
+  color: #fff;
+}
+
+.panel {
+  border: 0px;
+  margin-bottom: 150px;
+}
+
+.panel-heading {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-color: #3766B4;
+}
+
+.panel-body {
+  background-color: #EDEDED;
+  margin-bottom: 180px;
+  z-index: 5;
+  -webkit-box-shadow: 0px 2px 32px #ACACAE;
+     -moz-box-shadow: 0px 2px 32px #ACACAE;
+          box-shadow: 0px 2px 32px #ACACAE;
+}
+
+
+hr {
+  border-width: 2px;
+  border-color: #3766B4;
+}
+
+/*
+* Sticky footer, sin wraper, neat!
+*/
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 159px; /* Margin bottom by footer height */
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 159px; /* Set the fixed height of the footer here */
+  background-color: #f5f5f5;
+}
+
+/*
+* Table striped cambia el color para el diseño que me pasaron
+*/
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+  background-color: #CCCCCC;
+}
+
+
+@font-face {
+  font-family: 'NeutraText-Book';
+  src: url('../fonts/NeutraText-Book.otf');
+}
+
+body {
+  font-family: 'NeutraText-Book';
+  font-size:16px;
+}

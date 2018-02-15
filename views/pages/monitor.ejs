@@ -239,9 +239,9 @@
                                 <h2>Piezas terminadas: 
                                     <span id="pt">
                                         <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                            <%= calidad[0].pt %> mts
+                                            <%= calidad[0].pt %> pzas
                                         <% } else{ %> 
-                                            0 mts
+                                            0 pzas
                                         <% } %>
                                     </span>
                                 </h2>
@@ -252,9 +252,9 @@
                                 <h2>Scrap: 
                                     <span id="scrap">
                                         <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                            <%= (calidad[0].scrap).toFixed(2) %> mts
+                                            <%= (calidad[0].scrap).toFixed(2) %> pzas
                                         <% } else{ %> 
-                                            0 mts
+                                            0 pzas
                                         <% } %>
                                     </span>
                                 </h2>
@@ -271,8 +271,11 @@
     </script> 
     <script>
 
-        //var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
-        var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
+        // dev.kinnilweb.com
+        var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
+        // ezair.kinnilweb.com
+        //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
+        // localhost:3000
         //var socket = io.connect('localhost:3000');
 
         socket.on('message', function(message) {
@@ -313,23 +316,12 @@
                 $('#estado-color').addClass('grey');
                 $('#estado-color').removeClass('red');
                 $('#estado-color').removeClass('green');
-                $("#estado-color").html("Offline"); // Se manda un status offline cuando no se han recibido status en mas de 60 segundos
+                $("#estado").html("Offline"); // Se manda un status offline cuando no se han recibido status en mas de 60 segundos
             }
-
-
-            /*if (message.estado[0].razon == 'activo'){
-                 console.log('verde');
-                 $('#estado-color').addClass('green');
-                 $('#estado-color').removeClass('red');
-             } else {
-                 console.log('rojo');
-                 $('#estado-color').addClass('red');
-                 $('#estado-color').removeClass('green');
-             }*/
-
 
             // TODO: Esto solo muestra info de una maquina, hay que mostrar la info de mas maquinas
             //$("#estado").html(message.estado[0].razon);
+            $("#turno").html(message.turnoActual[0].nombre);
             $("#maquina").html(message.estado[0].nombre); // TODO: no puede ser el ID de la maquina, me tiene que regresar el nombre
             $("#producto").html(message.estado[0].producto);
 
@@ -353,9 +345,9 @@
             // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
             if (message.calidad.length > 0) { 
                 $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
-                $("#pt").html(message.calidad[0].pt + " mts"); // Pieza terminada no esta con decimales porque nunca lleva
-                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " mts");
-                //$("#total").html((message.calidad[0].total).toFixed(2) + " mts");
+                $("#pt").html(message.calidad[0].pt + " pzas"); // Pieza terminada no esta con decimales porque nunca lleva
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
+                //$("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
             }
             else {
                 $("#calidad").html("0%");

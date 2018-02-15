@@ -7,38 +7,57 @@
 </head>
 
 <body>
-   <div id="wrapper">
-      <!-- Sidebar -->
 
-
-      <div id="sidebar-wrapper">
-         <%include ../partials/sidebar-wrapper %>
-      </div>
-      <!-- Page Content -->
-
-
-      <div id="page-content-wrapper">
-         <%include ../partials/navbar %>
-
-         <div class="container-fluid" id="contenedor-maestro">
-            <h1>User</h1>
-            <strong>id</strong>: <%= user.id %><br>
-            <strong>username</strong>: <%= user.username %><br>
-            <strong>password</strong>: <%= user.password %><br>
-            email: <%= user.email %><br>
-            <strong>rol</strong>: <%= user.role %><br>
-            <a class="btn btn-default" href="logout"><i aria-hidden="true" class="fa fa-sign-out">Cerrar sesión</i></a><br>
-            <br/>
-            <br/>
-            <br/>
-
-            <div class="grid-stack" id="custom-stack-items">
+<%include ../partials/logos %>
+<div class="menu">
+    <div class="panel with-nav-tabs panel-primary">
+        <div class="panel-heading">
+            <ul class="nav nav-tabs">
+                <li><a href="inicio">Inicio</a></li>
+                <li><a href="disponibilidad">Disponibilidad</a></li>
+                <li><a href="rendimiento">Rendimiento</a></li>
+                <li><a href="calidad">Calidad</a></li>
+                <li><a href="oee">OEE</a></li>
+                <li><a href="modificarcalidad">Modificar calidad</a></li>
+                <li><a href="superusuario">Panel super usuario</a></li>
+                <li class="pull-right">
+                    <a href="configuracion" class="btn btn-primary-outline"><i class="fa fa-cog" aria-hidden="true"> Configuración</i></a>
+                </li>
+                <li class="pull-right">
+                    <a href="usuario" class="btn btn-primary"><i class="fa fa-user-o" aria-hidden="true"> <%= user.username %></i></a>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade in active">
+                    <div class="container">
+                    <div class="row">
+                        
+                        <div class="container-fluid" id="contenedor-maestro">
+                            <h1>User</h1>
+                            <hr/>
+                            <p><strong>id</strong>: <%= user.id %></p>
+                            <p><strong>username</strong>: <%= user.username %></p>
+                            <p><strong>password</strong>: <%= user.password %></p>
+                            <p>email: <%= user.email %></p>
+                            <p><strong>rol</strong>: <%= user.role %></p>
+                            <p><a class="btn btn-primary" href="logout"><i aria-hidden="true" class="fa fa-sign-out"></i>Cerrar sesión</a></p>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                        </div>
+                        
+                    </div>
+                    </div>
+                </div>
             </div>
-         </div>
-      </div>
-      <!-- /#page-content-wrapper -->
-   </div>
-   <!-- /#wrapper -->
-   <%include ../partials/js %>
+        </div>
+    </div>
+</div>
+
+<%include ../partials/footer %>
+<%include ../partials/js %>
 </body>
 </html>

@@ -7,83 +7,105 @@
 </head>
 
 <body>
-   <div id="wrapper">
-      <!-- Sidebar -->
-      <div id="sidebar-wrapper">
-         <%include ../partials/sidebar-wrapper %>
-      </div>
-      <!-- Page Content -->
-      <div id="page-content-wrapper">
-         <%include ../partials/navbar %>
 
-         <div class="container-fluid" id="contenedor-maestro">
-            <h1>Superusuario</h1>
-            <hr>
-            <div>
-                <!-- Nav tabs -->
-               <ul class="nav nav-tabs" role="tablist">
-                <li class="active" role="presentation">
-                    <a aria-controls="principal" data-toggle="tab" href="#principal" role="tab">Principal</a>
+<%include ../partials/logos %>
+<div class="menu">
+    <div class="panel with-nav-tabs panel-primary">
+        <div class="panel-heading">
+            <ul class="nav nav-tabs">
+                <li><a href="inicio">Inicio</a></li>
+                <li><a href="disponibilidad">Disponibilidad</a></li>
+                <li><a href="rendimiento">Rendimiento</a></li>
+                <li><a href="calidad">Calidad</a></li>
+                <li><a href="oee">OEE</a></li>
+                <li><a href="modificarcalidad">Modificar calidad</a></li>
+                <li class="active"><a href="superusuario">Panel super usuario</a></li>
+                <li class="pull-right">
+                    <a href="configuracion" class="btn btn-primary-outline"><i class="fa fa-cog" aria-hidden="true"> Configuración</i></a>
                 </li>
-                <li role="presentation">
-                    <a aria-controls="version" data-toggle="tab" href="#version" role="tab">Version</a>
+                <li class="pull-right">
+                    <a href="usuario" class="btn btn-primary-outline"><i class="fa fa-user-o" aria-hidden="true"> <%= user.username %></i></a>
                 </li>
-                <li role="presentation">
-                    <a aria-controls="version" data-toggle="tab" href="#tz" role="tab">Timezone</a>
-                </li>
-                </ul>
-                <div class="tab-content"> 
-                    <div class="tab-pane active" id="principal" role="tabpanel">
-                    <!-- 
-                        Principal
-                    -->
-                     <h4>Principal</h4>
-                    </div>
-                    <div class="tab-pane" id="version" role="tabpanel">
-                    <!-- 
-                        Versiones
-                    -->
-                     <h4>Versiones</h4>
-                     <div class="form-group">
-                        <select class="form-control" id="sel1">
-                           <option>
-                              Tiempos muertos
-                           </option>
-                           <option>
-                              Tiempos muertos y calidad
-                           </option>
-                           <option>
-                              OEE
-                           </option>
-                        </select>
-                     </div>
-                    </div>
-                    <div class="tab-pane" id="tz" role="tabpanel">
-                        <!-- 
-                            Versiones
-                        -->
-                         <h4>Timezone</h4>
-                         <p>Actual: America/Chihuahua</p>
+            </ul>
+        </div>
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade in active">
+                    <div class="container">
+                    <div class="row">
+                        
+                        <div class="container-fluid" id="contenedor-maestro"> <!-- contenedor -->
+                            <h1>Superusuario</h1>
+                            <hr/>
+                            <div>
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-pills" role="tablist">
+                                <li class="active" role="presentation">
+                                    <a aria-controls="principal" data-toggle="tab" href="#principal" role="tab">Principal</a>
+                                </li>
+                                <li role="presentation">
+                                    <a aria-controls="version" data-toggle="tab" href="#version" role="tab">Version</a>
+                                </li>
+                                <li role="presentation">
+                                    <a aria-controls="version" data-toggle="tab" href="#tz" role="tab">Timezone</a>
+                                </li>
+                                </ul>
+                                <div class="tab-content"> 
+                                    <div class="tab-pane active" id="principal" role="tabpanel">
+                                    <!-- 
+                                        Principal
+                                    -->
+                                        <h4>Principal</h4>
+                                    </div>
+                                    <div class="tab-pane" id="version" role="tabpanel">
+                                    <!-- 
+                                        Versiones
+                                    -->
+                                        <h4>Versiones</h4>
+                                        <div class="form-group">
+                                        <select class="form-control" id="sel1">
+                                            <option>
+                                                Tiempos muertos
+                                            </option>
+                                            <option>
+                                                Tiempos muertos y calidad
+                                            </option>
+                                            <option>
+                                                OEE
+                                            </option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tz" role="tabpanel">
+                                        <!-- 
+                                            Versiones
+                                        -->
+                                            <h4>Timezone</h4>
+                                            <p>Actual: America/Chihuahua</p>
+                
+                                            <p>Cambiar:</p>
+                                            <div id="map" style="width:80%"></div>
+                                            <button onclick="saveTz()" class="btn btn-primary" id="savetz" type="button"><i class="fa fa-floppy-o" aria-hidden="true"></i> Guardar</button> 
+                                    </div> 
+                                            
+                                </div>
+                
+                            </div>   
+                            </div> <!-- contenedor --> 
 
-                         <p>Cambiar:</p>
-                         <div id="map" style="width:80%"></div>
-                         <button onclick="saveTz()" class="btn btn-primary" id="savetz" type="button"><i class="fa fa-floppy-o" aria-hidden="true"></i> Guardar</button> 
-                    </div> 
-                         
+
+                    </div>
+                    </div>
                 </div>
-
             </div>
+        </div>
+    </div>
+</div>
+
+<%include ../partials/footer %>
 
 
-            
 
-            <div class="grid-stack" id="custom-stack-items">
-            </div>
-         </div>
-      </div>
-      <!-- /#page-content-wrapper -->
-   </div>
-   <!-- /#wrapper -->
    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
    <!-- TODO: Cambiar esto a que se cargue localmente -->
    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment-with-locales.min.js"></script>
@@ -92,9 +114,12 @@
    <script src="/socket.io/socket.io.js"></script> 
 
    <script>
-    //var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
-    var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
-    //var socket = io.connect('http://localhost:3000');
+    // dev.kinnilweb.com
+    var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
+    // ezair.kinnilweb.com
+    //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
+    // localhost:3000
+    //var socket = io.connect('localhost:3000');
 
     // Inicializa el timezone pricker
     

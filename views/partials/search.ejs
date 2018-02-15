@@ -1,3 +1,4 @@
+<div class="col-lg-6">
 <form class = "form-horizontal">
   <div class="form-group">
     <label for="sel1">Planta:</label>
@@ -51,6 +52,9 @@
     </div>
   </div>
   <br/>
+
+</div>
+<div class="col-lg-6">
   <div class="form-group">
     <label for="sel1">Opciones:</label>
     <div class="">
@@ -99,6 +103,11 @@
         </div>
       </div>
   </div>
-  <button onclick="consultar()" id="btnConsultar" type="submit" class="btn btn-primary">Consultar</button>
+  
+  <div class="form-group" style="padding-top:50px;">
+      <button class="btn btn-primary pull-right hidden-print" id="Print"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Exportar a PDF</button>
+      <button class="btn btn-primary pull-right" style="margin-right:10px" onclick="consultar()" id="btnConsultar" type="submit" >Consultar</button>
+  </div>
+  
 </form>
-
+</div>

@@ -13,7 +13,7 @@ var promiseMysql = require('promise-mysql');
 promisePool = promiseMysql.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: 'FundableD0ubles',
+	password: 'Fundabled0ubles',
 	database: 'kinnil',
 	connectionLimit: 5000
 });

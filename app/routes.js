@@ -293,6 +293,52 @@ module.exports = function(app, passport) {
 					});
 				});
 				break;
+			case "agregarRazonesParo":
+				var nombre = req.body.nombre
+				var maquina = req.body.maquina
+
+				var razonDeParo  = {nombre: nombre, maquinas_id: maquina, active: true};
+				promisePool.getConnection().then(function(connection) {
+						connection.query('INSERT INTO razones_paro SET ?', razonDeParo).then(function(rows){
+
+							console.log("se agrego una razon de calidad")
+							// Suelta la conexion ejemplo: Connection 404 released
+							//connection.release();
+							// Parece que funciona igual al de arriba. Hay que probarlo en desarrollo
+							promisePool.releaseConnection(connection);
+
+							// TODO: crear las razones de paro para ese producto. Insertar las en la DB, todas las que sean default. poner una area para definir las default.....!?
+							// TODO: ver si agregar un area para definir las razones de calidad, y ver si se tienen que inertar por default, preguntar a ricardo
+							// return_data.turnos = rows
+					}).catch(function(err) {
+						// TODO: cambiar los console.log por un buen sistema de logueo de errores
+						console.log(err);
+					});
+				});
+				break;
+			case "agregarRazonesCalidad":
+				var nombre = req.body.nombre
+				var maquina = req.body.maquina
+
+				var razonDeCalidad  = {nombre: nombre, maquinas_id: maquina, activo: true};
+				promisePool.getConnection().then(function(connection) {
+						connection.query('INSERT INTO razones_calidad SET ?', razonDeCalidad).then(function(rows){
+
+							console.log("se agrego una razon de calidad")
+							// Suelta la conexion ejemplo: Connection 404 released
+							//connection.release();
+							// Parece que funciona igual al de arriba. Hay que probarlo en desarrollo
+							promisePool.releaseConnection(connection);
+
+							// TODO: crear las razones de paro para ese producto. Insertar las en la DB, todas las que sean default. poner una area para definir las default.....!?
+							// TODO: ver si agregar un area para definir las razones de calidad, y ver si se tienen que inertar por default, preguntar a ricardo
+							// return_data.turnos = rows
+					}).catch(function(err) {
+						// TODO: cambiar los console.log por un buen sistema de logueo de errores
+						console.log(err);
+					});
+				});
+				break;
 			case "agregarProductos":
 				var nombre = req.body.nombre
 				var disponibilidad = req.body.disponibilidad
@@ -396,6 +442,11 @@ module.exports = function(app, passport) {
 		})	
 	});
 
+	/*
+	* Razones de paro
+	*/
+
+	// Cambiar el nombre de las razones de paro
 	app.post('/configuracion/modif-maquinas-nombre', isLoggedIn, function(req, res) {
 		
 		Eventos.modificarNombreMaquina(req.body.pk, req.body.value, function(err, actualizado) {
@@ -408,6 +459,7 @@ module.exports = function(app, passport) {
 		})
 	});
 
+	// Cambiar la maquina asignada a la razon de paro
 	app.post('/configuracion/modif-maquinas-producto', isLoggedIn, function(req, res) {
 		
 		// TODO: hacer algo con el dropbox, algunas veces no funciona, checar!
@@ -420,6 +472,42 @@ module.exports = function(app, passport) {
 			}
 		})
 	});
+
+	/*
+	* Razones de Calidad 
+	*/
+
+	// Cambiar el nombre de las Razones de calidad
+	app.post('/configuracion/modif-calidad-nombre', isLoggedIn, function(req, res) {
+		
+		// TODO: hacer algo con el dropbox, algunas veces no funciona, checar!
+		Eventos.modificarNombreRazonesCalidad(req.body.pk, req.body.value, function(err, actualizado) {
+			//console.log(actualizado)
+			if (actualizado) {
+				res.sendStatus(200); // Manda una respuesta OK, si si se pudo actualizar la fila
+			} else {
+				res.sendStatus(400); // Manda no ok si hubo algun error
+			}
+		})
+	});
+
+	// Cambiar la maquina de las razones de calidad
+	app.post('/configuracion/modif-calidad-maquina', isLoggedIn, function(req, res) {
+		
+		// TODO: hacer algo con el dropbox, algunas veces no funciona, checar!
+		Eventos.modificarMaquinaRazonesCalidad(req.body.pk, req.body.value, function(err, actualizado) {
+			//console.log(actualizado)
+			if (actualizado) {
+				res.sendStatus(200); // Manda una respuesta OK, si si se pudo actualizar la fila
+			} else {
+				res.sendStatus(400); // Manda no ok si hubo algun error
+			}
+		})
+	});
+
+	
+
+	
 
 	/*
 	* Borrar plantas - solo las desactivamos :) (active = false in MySql)
@@ -489,6 +577,21 @@ module.exports = function(app, passport) {
 	app.delete('/configuracion/razones/:razonId', isLoggedIn, function(req, res) {
 		
 		Eventos.deleteRazonDeParo(req.params.razonId, function(err, actualizado) {
+			//console.log(actualizado)
+			if (actualizado) {
+				res.sendStatus(200); // Manda una respuesta OK, si si se pudo actualizar la fila
+			} else {
+				res.sendStatus(400); // Manda no ok si hubo algun error
+			}
+		})
+	});
+
+	/*
+	* Borrar razones de calidad - solo las desactivamos :) (active = false in MySql)
+	*/
+	app.delete('/configuracion/calidad/:calidadId', isLoggedIn, function(req, res) {
+		
+		Eventos.deleteRazonDeCalidad(req.params.calidadId, function(err, actualizado) {
 			//console.log(actualizado)
 			if (actualizado) {
 				res.sendStatus(200); // Manda una respuesta OK, si si se pudo actualizar la fila

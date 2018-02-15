@@ -466,7 +466,7 @@ exports.getConfiguracion = function(done) {
 
             promisePool.releaseConnection(connection)
 
-            console.log(return_data)
+            
             return done(null, return_data)
             
         }).catch(function(err) {
@@ -528,6 +528,82 @@ exports.modificarProductoMaquina = function(pk, valor, done) {
     
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE maquinas SET productos_id ="' + valor + '" where id = ' + pk).then(function(rows){
+                promisePool.releaseConnection(connection);
+        }).then(function(rows) {
+            return done(null, true);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
+/*
+* Razones Paro
+*/
+
+// Modifica el nombre de las razones de paro
+exports.modificarNombreRazonesParo = function(pk, valor, done) {
+
+    promisePool.getConnection().then(function(connection) {
+        connection.query('UPDATE razones_paro SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
+                promisePool.releaseConnection(connection);
+        }).then(function(rows) {
+            return done(null, true);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
+// Modifica la maquina asignada a las razones de paro
+exports.modificarMaquinaRazonesParo = function(pk, valor, done) {
+    
+    promisePool.getConnection().then(function(connection) {
+        connection.query('UPDATE razones_paro SET maquinas_id ="' + valor + '" where id = ' + pk).then(function(rows){
+                promisePool.releaseConnection(connection);
+        }).then(function(rows) {
+            return done(null, true);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
+/*
+* Razones Calidad
+*/
+
+// Modifica el nombre de las razones de Calidad
+exports.modificarNombreRazonesCalidad = function(pk, valor, done) {
+
+    promisePool.getConnection().then(function(connection) {
+        connection.query('UPDATE razones_calidad SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
+                promisePool.releaseConnection(connection);
+        }).then(function(rows) {
+            return done(null, true);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
+// Modifica la maquina asignada a las razones de Calidad
+exports.modificarMaquinaRazonesCalidad = function(pk, valor, done) {
+    
+    promisePool.getConnection().then(function(connection) {
+        connection.query('UPDATE razones_calidad SET maquinas_id ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
         }).then(function(rows) {
             return done(null, true);
@@ -604,10 +680,32 @@ exports.deleteProducto = function(pk, done) {
     });
 }
 
+/*
+* Borrar razones de paro
+*/
 exports.deleteRazonDeParo = function(pk, done) {
     
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_paro SET active = 0 where id = ' + pk).then(function(rows){
+                promisePool.releaseConnection(connection);
+        }).then(function(rows) {
+            return done(null, true);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
+/*
+* Borrar razones de calidad
+*/
+exports.deleteRazonDeCalidad = function(pk, done) {
+    
+    promisePool.getConnection().then(function(connection) {
+        connection.query('UPDATE razones_calidad SET activo = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
         }).then(function(rows) {
             return done(null, true);
