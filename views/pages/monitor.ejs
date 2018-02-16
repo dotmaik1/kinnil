@@ -6,265 +6,284 @@
     <link rel="stylesheet" href="./css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/font-awesome.min.css">
     <style>
-        html,
-        body {
-            height: 100%;
+        .panel {
+            margin-bottom: 20px;
         }
-        
-        .jumbotron.vertical-center {
-            margin-bottom: 0;
-            /* Remove the default bottom margin of .jumbotron */
+        .panel-body {
+            background-color: #fff;
+            margin-bottom: 0px;
+            z-index: 5;
+            -webkit-box-shadow: 0px 2px 32px #ACACAE;
+            -moz-box-shadow: 0px 2px 32px #ACACAE;
+            box-shadow: 0px 2px 32px #ACACAE;
         }
-        
-        .vertical-center {
-            min-height: 100%;
-            /* Fallback for vh unit */
-            min-height: 100vh;
-            /* You might also want to use
-            'height' property instead.
-            Note that for percentage values of
-            'height' or 'min-height' properties,
-            the 'height' of the parent element
-            should be specified explicitly.
-            In this case the parent of '.vertical-center'
-            is the 
-            <body> element */
-            /* Make it a flex container */
-            display: -webkit-box;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            /* Align the bootstrap's container vertically */
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -moz-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            /* In legacy web browsers such as Firefox 9
-            we need to specify the width of the flex container */
-            width: 100%;
-            /* Also 'margin: 0 auto' doesn't have any effect on flex items in such web browsers
-            hence the bootstrap's container won't be aligned to the center anymore.
-            Therefore, we should use the following declarations to get it centered again */
-            -webkit-box-pack: center;
-            -moz-box-pack: center;
-            -ms-flex-pack: center;
-            -webkit-justify-content: center;
-            justify-content: center;
+
+        hr {
+            border-color: #fff;
         }
-        /*.panel-default > .panel-heading {
-        background-color: #35DA0C;
-        border-color: #93C47D;
-        }*/
-        
-        .panel-default > .green {
+      
+        .green {
             background-color: #35DA0C;
             border-color: #35DA0C;
         }
         
-        .panel-default > .red {
+        .red {
             background-color: #FD2412;
             border-color: #FD2412;
         }
 
+        .grey {
+            background-color: #757474;
+            color: #ffffff;
+        }
+
         @media (min-width: 768px) {
         .container {
-            width: 100%;
+            width: 90%;
         }
         }
         @media (min-width: 992px) {
         .container {
-            width: 100%;
+            width: 90%;
         }
         }
         @media (min-width: 1200px) {
         .container {
-            width: 100%;
+            width: 90%;
         }
+        }
+        h1, .h1, h2, .h2, h3, .h3 {
+           margin-top: 0px;
+           margin-bottom: 0px;
+        }
+
+        h1 {
+            font-size: 80px;
+        }
+
+        h2 {
+            font-size: 30px;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+        .panel-body-fix {
+            padding: 15px;
+            margin-right: -15px;
+            margin-left: -15px; 
+        }
+
+        .row-padded {
+            /*padding: 35px;*/
+            padding-top: 5px;
+            background-color: #CCCCCC;
+            border: 1px solid #DDD;
+            
+        }
+
+        .row-padded-2 {
+            /*padding: 35px;*/
+            padding-bottom: 5px;
+            background-color: #E6E7E9;
+            border: 1px solid #DDD;
+        }
+
+        .line {
+            width: 100%;
+            height: 30px;
+            background-color: #357BB7;
+            margin-bottom: 40px;
         }
     </style>
 </head>
 
 <body>
-    <div class="jumbotron vertical-center">
-        <div class="container text-center">
-            <div class="panel panel-default"  >
-                <div id="estado-color" class="panel-heading 
-                <%if (estado[0]) { %> 
-                    <%if (estado[0].status == 'online') { %> 
-                        <%if (estado[0].razones_paro_id == 200 || estado[0].razones_paro_id == 201) { %> 
-                            grey
-                        <% } else { %>  
-                            <%= estado[0].razon == 'activo' ?  "green"  : "red"  %> 
-                        <% } %>
-                    <% } else { %>  grey  <% } %>
-                <% } else { %>  grey  <% } %>
-                ">
-                    <h1 class="panel-title" id="estado">
-                        <%if (estado[0]) { %>
-                            <%= estado[0].razon %>
-                        <% } else { %> 
-                            Sin eventos
-                        <% } %>
-                    </h1>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="top-bg">
-                                <h2>Producto: 
-                                    <span id="producto">
+
+<%include ../partials/logos %>
+<div class="line">
+
+</div>
+        <div class="container">
+            <div class="row"> 
+
+                <div class="panel panel-default">
+                    <div id="estado-color" class="panel-body panel-body-fix <%if (estado[0]) { %> 
+                            <%if (estado[0].status == 'online') { %> 
+                                <%if (estado[0].razones_paro_id == 200 || estado[0].razones_paro_id == 201) { %> 
+                                    grey
+                                <% } else { %>  
+                                    <%= estado[0].razon == 'activo' ?  "green"  : "red"  %> 
+                                <% } %>
+                            <% } else { %>  grey  <% } %>
+                        <% } else { %>  grey  <% } %>
+                        ">
+                        <div class="row">
+                            <h1 class="text-center" id="estado">
+                                <%if (estado[0]) { %>
+                                    <%if (estado[0].status == 'online') { %>
+                                        <%= estado[0].razon %>
+                                    <% } else { %> 
+                                        Offline
+                                    <% } %>
+                                <% } else { %> 
+                                    Sin eventos
+                                <% } %>
+                            </h1>
+                            <hr/>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h2 class="text-center" id="producto">Porducto: 
                                     <%if (estado[0]) { %>
                                         <%= estado[0].producto %>
                                     <% } else { %> 
                                         Sin eventos
                                     <% } %>
-                                    </span>
                                 </h2>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="top-bg">
-                                <h2>Maquina:
-                                    <span id="maquina">
+                            <div class="col-md-4">
+                                <h2 class="text-center" id="maquina">Máquina: 
                                     <%if (estado[0]) { %>
                                         <%= estado[0].nombre %>
                                     <% } else { %> 
                                         Sin eventos
                                     <% } %>
-                                    </span> 
                                 </h2>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="top-bg">
-                                <h2>Turno: 
-                                    <span id="turno">
-                                        <%= turnoActual[0].nombre %>
-                                    </span>
-                                </h2>
+                            <div class="col-md-4">
+                                <h2 class="text-center" id="turno">Turno: <%= turnoActual[0].nombre %></h2>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Disponibilidad: 
-                                    <!-- Si el query de disponibilidad esta empty despliega un 0 -->
-                                    <span id="disponibilidad">
-                                    <%if (disponibilidad[0] && disponibilidad[0].disponibilidad !== null) { %>
-                                        <%= (disponibilidad[0].disponibilidad).toFixed(2) %> %
-                                    <% } else{ %> 
-                                        0%
-                                    <% } %>
-                                    </span>
-                                </h2>
+
+            </div> <!-- Row -->
+            <div class="row">
+
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row row-padded">
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Disponibilidad:</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Rendimiento:</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Calidad:</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center">OEE:</h2>
+                                </div>
+                            </div>
+                            <div class="row row-padded-2">
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="disponibilidad">
+                                        <%if (disponibilidad[0] && disponibilidad[0].disponibilidad !== null) { %>
+                                            <%= (disponibilidad[0].disponibilidad).toFixed(2) %> %
+                                        <% } else{ %> 
+                                            0%
+                                        <% } %>
+                                    </h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="rendimiento">
+                                        <%if (rendimiento[0] && rendimiento[0].rendimiento !== null) { %>
+                                            <%= (rendimiento[0].rendimiento).toFixed(2) %> %
+                                        <% } else{ %> 
+                                            0%
+                                        <% } %>
+                                    </h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="calidad">
+                                        <%if (calidad[0] && calidad[0].calidad !== null) { %>
+                                            <%= (calidad[0].calidad).toFixed(2) %> %
+                                        <% } else{ %> 
+                                            0%
+                                        <% } %>
+                                    </h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="oee">
+                                        <%if (calidad[0] && rendimiento[0] && disponibilidad[0]) { %>
+                                            <%= (calidad[0].calidad * rendimiento[0].rendimiento * disponibilidad[0].disponibilidad).toFixed(2) %> %
+                                        <% } else{ %> 
+                                            0%
+                                        <% } %>
+                                    </h2>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Rendimiento:
-                                    <span id="rendimiento">
-                                    <%if (rendimiento[0] && rendimiento[0].rendimiento !== null) { %>
-                                        <%= (rendimiento[0].rendimiento).toFixed(2) %> %
-                                    <% } else{ %> 
-                                        0%
-                                    <% } %>
-                                    </span>
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Calidad: 
-                                    <span id="calidad">
-                                    <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                        <%= (calidad[0].calidad).toFixed(2) %> %
-                                    <% } else{ %> 
-                                        0%
-                                    <% } %>
-                                    </span>
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>OEE: 
-                                    <span id="oee">
-                                    
-                                    <!-- TODO -->
-                                    <%if (calidad[0] && disponibilidad[0].disponibilidad !== null && rendimiento[0] && disponibilidad[0]) { %>
-                                        <!-- TODO: verificar que esto este bien -->
-                                        <%= ((calidad[0].calidad + rendimiento[0].rendimiento + disponibilidad[0].disponibilidad)/3).toFixed(2) %> %
-                                    <% } else{ %> 
-                                        0%
-                                    <% } %>
-                                    </span>
-                                </h2>
-                            </div>
-                        </div>
+
                     </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Tiempo activo: 
-                                    <span id="ta">
-                                    <!-- Si el query de disponibilidad esta empty despliega un 0 -->
-                                    <%if (disponibilidad[0]) { %>
-                                        <%= (disponibilidad[0].ta/60/60).toFixed(2) %> horas
-                                    <% } else{ %> 
-                                        0 horas
-                                    <% } %>
-                                    </span>
-                                </h2>
+                </div> <!-- Row -->
+                <div class="row">
+                    <div class="panel panel-info">
+                        <div class="panel-body ">
+                            <div class="row row-padded">
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Tiempo activo:</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Tiempo muerto:</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Piezas terminadas:</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center">Scrap:</h2>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Tiempo muerto: 
-                                    <span id="tm">
-                                    <!-- Si el query de disponibilidad esta empty despliega un 0 -->
-                                    <%if (disponibilidad[0]) { %>
-                                        <%= (disponibilidad[0].tm/60/60).toFixed(2) %> hrs
-                                    <% } else{ %> 
-                                        0 horas
-                                    <% } %>
-                                    </span>
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Piezas terminadas: 
-                                    <span id="pt">
+                            <div class="row row-padded-2">
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="ta">
+                                        <%if (disponibilidad[0] && disponibilidad[0].disponibilidad !== null) { %>
+                                            <%= (disponibilidad[0].ta /60 /60).toFixed(2) %> hrs 
+                                        <% } else{ %> 
+                                            0 hrs
+                                        <% } %>
+                                    </h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="tm">
+                                        <%if (disponibilidad[0] && disponibilidad[0].disponibilidad !== null) { %>
+                                            <%= (disponibilidad[0].tm /60 /60).toFixed(2) %> hrs
+                                        <% } else{ %> 
+                                            0 hrs
+                                        <% } %>
+                                    </h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="pt">
                                         <%if (calidad[0] && calidad[0].calidad !== null) { %>
                                             <%= calidad[0].pt %> pzas
                                         <% } else{ %> 
                                             0 pzas
                                         <% } %>
-                                    </span>
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Scrap: 
-                                    <span id="scrap">
+                                    </h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <h2 class="text-center" id="scrap">
                                         <%if (calidad[0] && calidad[0].calidad !== null) { %>
                                             <%= (calidad[0].scrap).toFixed(2) %> pzas
                                         <% } else{ %> 
                                             0 pzas
                                         <% } %>
-                                    </span>
-                                </h2>
+                                    </h2>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                </div> <!-- Row -->
+        </div> <!-- Container -->
+<%include ../partials/footer %>
+
+
+
+    
     <script src="http://code.jquery.com/jquery-1.10.1.min.js">
     </script> 
     <script src="/socket.io/socket.io.js">

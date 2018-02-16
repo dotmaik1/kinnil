@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
     <title>Monitor</title>
     <link rel="stylesheet" href="./css/bootstrap.css" rel="stylesheet">
@@ -12,13 +13,22 @@
         
         .jumbotron.vertical-center {
             margin-bottom: 0;
+            /* Remove the default bottom margin of .jumbotron */
         }
         
         .vertical-center {
             min-height: 100%;
             /* Fallback for vh unit */
             min-height: 100vh;
-
+            /* You might also want to use
+            'height' property instead.
+            Note that for percentage values of
+            'height' or 'min-height' properties,
+            the 'height' of the parent element
+            should be specified explicitly.
+            In this case the parent of '.vertical-center'
+            is the 
+            <body> element */
             /* Make it a flex container */
             display: -webkit-box;
             display: -moz-box;
@@ -43,156 +53,349 @@
             -webkit-justify-content: center;
             justify-content: center;
         }
-
+        /*.panel-default > .panel-heading {
+        background-color: #35DA0C;
+        border-color: #93C47D;
+        }*/
         
         .panel-default > .green {
-            background-color: #93C47D;
-            border-color: #93C47D;
+            background-color: #35DA0C;
+            border-color: #35DA0C;
         }
         
         .panel-default > .red {
-            background-color: #FF0000;
-            border-color: #FF0000;
+            background-color: #FD2412;
+            border-color: #FD2412;
+        }
+
+        @media (min-width: 768px) {
+        .container {
+            width: 100%;
+        }
+        }
+        @media (min-width: 992px) {
+        .container {
+            width: 100%;
+        }
+        }
+        @media (min-width: 1200px) {
+        .container {
+            width: 100%;
+        }
         }
     </style>
 </head>
 
 <body>
-    <div class="jumbotron vertical-center">
-        <div class="container text-center">
-            <div class="panel panel-default">
-                <!-- green red -->
-                <div class="panel-heading" id="estado-heading">
-                    <h1 class="panel-title" id="estado">
-                        Sin eventos
-                    </h1>
+
+<%include ../partials/logos %>
+<div class="menu">
+    <div class="panel with-nav-tabs panel-primary">
+        <div class="panel-heading">
+            <ul class="nav nav-tabs">
+
+
+            </ul>
+        </div>
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade in active">
+                    <div class="container">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="top-bg">
-                                <h2>Producto:
-
-                                </h2>
-                            </div>
+                        
+                            
+<div class="jumbotron vertical-center">
+    <div class="container text-center">
+        <div class="panel panel-default"  >
+            <div id="estado-color" class="panel-heading 
+            <%if (estado[0]) { %> 
+                <%if (estado[0].status == 'online') { %> 
+                    <%if (estado[0].razones_paro_id == 200 || estado[0].razones_paro_id == 201) { %> 
+                        grey
+                    <% } else { %>  
+                        <%= estado[0].razon == 'activo' ?  "green"  : "red"  %> 
+                    <% } %>
+                <% } else { %>  grey  <% } %>
+            <% } else { %>  grey  <% } %>
+            ">
+                <h1 class="panel-title" id="estado">
+                    <%if (estado[0]) { %>
+                        <%= estado[0].razon %>
+                    <% } else { %> 
+                        Sin eventos
+                    <% } %>
+                </h1>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="top-bg">
+                            <h2>Producto: 
+                                <span id="producto">
+                                <%if (estado[0]) { %>
+                                    <%= estado[0].producto %>
+                                <% } else { %> 
+                                    Sin eventos
+                                <% } %>
+                                </span>
+                            </h2>
                         </div>
-                        <div class="col-md-4">
-                            <div class="top-bg">
-                                <h2>Maquina:
-                                    
-                                </h2>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="top-bg">
+                            <h2>Maquina:
+                                <span id="maquina">
+                                <%if (estado[0]) { %>
+                                    <%= estado[0].nombre %>
+                                <% } else { %> 
+                                    Sin eventos
+                                <% } %>
+                                </span> 
+                            </h2>
                         </div>
-                        <div class="col-md-4">
-                            <div class="top-bg">
-                                <h2>Turno:
-
-                                </h2>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="top-bg">
+                            <h2>Turno: 
+                                <span id="turno">
+                                    <%= turnoActual[0].nombre %>
+                                </span>
+                            </h2>
                         </div>
                     </div>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Disponibilidad: 
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Disponibilidad: 
+                                <!-- Si el query de disponibilidad esta empty despliega un 0 -->
+                                <span id="disponibilidad">
+                                <%if (disponibilidad[0] && disponibilidad[0].disponibilidad !== null) { %>
+                                    <%= (disponibilidad[0].disponibilidad).toFixed(2) %> %
+                                <% } else{ %> 
                                     0%
-                                </h2></div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Rendimiento: 
-                                    0%
-                                </h2></div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Calidad: 
-                                    0%
-                                </h2></div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>OEE: 
-                                    0%
-                                </h2></div>
+                                <% } %>
+                                </span>
+                            </h2>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Tiempo activo: 
-                                    0hrs
-                                </h2></div>
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Rendimiento:
+                                <span id="rendimiento">
+                                <%if (rendimiento[0] && rendimiento[0].rendimiento !== null) { %>
+                                    <%= (rendimiento[0].rendimiento).toFixed(2) %> %
+                                <% } else{ %> 
+                                    0%
+                                <% } %>
+                                </span>
+                            </h2>
                         </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Tiempo muerto: 
-                                    0hrs
-                                </h2></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Calidad: 
+                                <span id="calidad">
+                                <%if (calidad[0] && calidad[0].calidad !== null) { %>
+                                    <%= (calidad[0].calidad).toFixed(2) %> %
+                                <% } else{ %> 
+                                    0%
+                                <% } %>
+                                </span>
+                            </h2>
                         </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Kgs buenos:</h2></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>OEE: 
+                                <span id="oee">
+                                
+                                <!-- TODO -->
+                                <%if (calidad[0] && disponibilidad[0].disponibilidad !== null && rendimiento[0] && disponibilidad[0]) { %>
+                                    <!-- TODO: verificar que esto este bien -->
+                                    <%= ((calidad[0].calidad + rendimiento[0].rendimiento + disponibilidad[0].disponibilidad)/3).toFixed(2) %> %
+                                <% } else{ %> 
+                                    0%
+                                <% } %>
+                                </span>
+                            </h2>
                         </div>
-                        <div class="col-md-3">
-                            <div class="top-bg">
-                                <h2>Kgs malos:</h2></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Tiempo activo: 
+                                <span id="ta">
+                                <!-- Si el query de disponibilidad esta empty despliega un 0 -->
+                                <%if (disponibilidad[0]) { %>
+                                    <%= (disponibilidad[0].ta/60/60).toFixed(2) %> horas
+                                <% } else{ %> 
+                                    0 horas
+                                <% } %>
+                                </span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Tiempo muerto: 
+                                <span id="tm">
+                                <!-- Si el query de disponibilidad esta empty despliega un 0 -->
+                                <%if (disponibilidad[0]) { %>
+                                    <%= (disponibilidad[0].tm/60/60).toFixed(2) %> hrs
+                                <% } else{ %> 
+                                    0 horas
+                                <% } %>
+                                </span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Piezas terminadas: 
+                                <span id="pt">
+                                    <%if (calidad[0] && calidad[0].calidad !== null) { %>
+                                        <%= calidad[0].pt %> pzas
+                                    <% } else{ %> 
+                                        0 pzas
+                                    <% } %>
+                                </span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="top-bg">
+                            <h2>Scrap: 
+                                <span id="scrap">
+                                    <%if (calidad[0] && calidad[0].calidad !== null) { %>
+                                        <%= (calidad[0].scrap).toFixed(2) %> pzas
+                                    <% } else{ %> 
+                                        0 pzas
+                                    <% } %>
+                                </span>
+                            </h2>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%include ../partials/footer %>
+
+
+
+
+    
     <script src="http://code.jquery.com/jquery-1.10.1.min.js">
     </script> 
     <script src="/socket.io/socket.io.js">
     </script> 
     <script>
-         
-         // dev.kinnilweb.com
+
+        // dev.kinnilweb.com
         var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
         // ezair.kinnilweb.com
         //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
         // localhost:3000
         //var socket = io.connect('localhost:3000');
- 
-         socket.on('estado-actual', function(message) {
-             
-             console.log(message);
-             var mensaje = JSON.parse(message);
-             $('#estado').html(mensaje.nombre);
-             
- 
-             if (mensaje.razones_id == '1'){
-                 console.log('verde');
-                 $('#estado-heading').addClass('green');
-                 $('#estado-heading').removeClass('red');
-             } else {
-                 console.log('rojo');
-                 $('#estado-heading').addClass('red');
-                 $('#estado-heading').removeClass('green');
-             }
-         })
-         
-         socket.on('message', function(message) {
-             console.log('el server esta vivo');
-         })
-         
-         function myFunction() {
-             var obj = { "razones_id":"1"};
-             var myJSON = JSON.stringify(obj);
- 
-             socket.emit('evento', myJSON)
- 
-         }
- 
-         function myFunction2() {
-             var obj = { "razones_id":"2"};
-             var myJSON = JSON.stringify(obj);
- 
-             socket.emit('evento', myJSON)
-             
-         }
-    </script>
+
+        socket.on('message', function(message) {
+            console.log('el server esta vivo');
+        })
+
+        var tid = setInterval(mycode, 15000);
+        function mycode() {
+            console.log("mande a actualizar");
+            socket.emit('actualizar', "please"); // El mensaje enviado no es utilizado para la actualizacion.
+        }
+
+        socket.on('actualizar', function(message) {
+
+            console.log("actualizar evento");
+            // Agrega color a la tabla que muestra el estatus
+
+            // TODO: este codigo solo funciona para cuando hay una sola maquina, todabia hay que hacer que funcione para mas maquinas
+            if (message.estado[0].status == 'online') {
+                if (message.estado[0].razon == 'activo'){
+                    $('#estado-color').addClass('green');
+                    $('#estado-color').removeClass('red');
+                    $('#estado-color').removeClass('grey');
+                } else {
+                    if (message.estado[0].razones_paro_id == 200 || message.estado[0].razones_paro_id == 201){
+                        $('#estado-color').addClass('grey');
+                        $('#estado-color').removeClass('red');
+                        $('#estado-color').removeClass('green');
+                    } else {
+                        //console.log('rojo');
+                        $('#estado-color').addClass('red');
+                        $('#estado-color').removeClass('green');
+                        $('#estado-color').removeClass('grey');
+                    }
+                }
+                $("#estado").html(message.estado[0].razon);  
+            } else {
+                $('#estado-color').addClass('grey');
+                $('#estado-color').removeClass('red');
+                $('#estado-color').removeClass('green');
+                $("#estado").html("Offline"); // Se manda un status offline cuando no se han recibido status en mas de 60 segundos
+            }
+
+            // TODO: Esto solo muestra info de una maquina, hay que mostrar la info de mas maquinas
+            //$("#estado").html(message.estado[0].razon);
+            $("#turno").html(message.turnoActual[0].nombre);
+            $("#maquina").html(message.estado[0].nombre); // TODO: no puede ser el ID de la maquina, me tiene que regresar el nombre
+            $("#producto").html(message.estado[0].producto);
+
+            // Si disponibilidad viene vacio hay que poner un 0 ( disponibilidad: [] )
+            if (message.disponibilidad.length > 0) {
+                $("#disponibilidad").html((message.disponibilidad[0].disponibilidad).toFixed(2) + " %");
+                $("#ta").html((message.disponibilidad[0].ta /60 /60).toFixed(2) + " hrs");
+                $("#tm").html((message.disponibilidad[0].tm /60 /60).toFixed(2) + " hrs");
+            } else {
+                $("#disponibilidad").html("0%");
+            }
+
+            // Si rendimiento viene vacio hay que poner un 0 ( rendimiento: [] )
+            if (message.rendimiento.length > 0){
+                $("#rendimiento").html((message.rendimiento[0].rendimiento).toFixed(2) + " %");
+            }
+            else {
+                $("#rendimiento").html("0%");
+            }
+
+            // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
+            if (message.calidad.length > 0) { 
+                $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
+                $("#pt").html(message.calidad[0].pt + " pzas"); // Pieza terminada no esta con decimales porque nunca lleva
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
+                //$("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
+            }
+            else {
+                $("#calidad").html("0%");
+            }
+
+            // Calcula el OEE disponibilidad + rendimiento + calidad
+            // TODO: Penzar esto un poco mas porque asi si sale un numero degativo se va a desplegar 0%
+            if (message.disponibilidad.length > 0 && message.rendimiento.length > 0 && message.calidad.length > 0)
+                $("#oee").html(((message.disponibilidad[0].disponibilidad + message.rendimiento[0].rendimiento + message.calidad[0].calidad)/3).toFixed(2)  + " %");
+            else
+                $("#oee").html("0%");
+
+            var mensaje = JSON.stringify(message);
+            console.log('se recibio un valor: ' + mensaje);
+        })
+    </script> 
 </body>
 </html>
