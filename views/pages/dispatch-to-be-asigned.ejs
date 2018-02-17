@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+   <%include ../partials/head %>
+   <title>Inicio</title>
+</head>
+
+<body>
+
+        <%include ../partials/navbar %>
+        
+        <div class="wrapper">
+                <!-- Sidebar Holder -->
+                <%include ../partials/sidebar %>
+    
+                <!-- Page Content Holder -->
+                <div id="content">
+    
+                    <ul class="nav nav-tabs">
+                        <li role="presentation" class="active"><a href="#">To be Asigned</a></li>
+                        <li role="presentation"><a href="#">Work in progress</a></li>
+                        <li role="presentation"><a href="#">Completed</a></li>
+                    </ul>
+                    <div class="tab-content"> 
+                        <div class="content">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>Import Jobs <button> Upload (.csv file)</button></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+    
+                    
+                </div>
+            </div>
+    
+
+
+    <!-- <script src="/socket.io/socket.io.js"></script>  -->
+    <%include ../partials/js %>
+    <script>
+        //var socket = io.connect('http://localhost:3000');
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+
+</body>
+</html>
