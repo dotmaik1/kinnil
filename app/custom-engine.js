@@ -876,14 +876,17 @@ module.exports = function(io) {
 
             fecha = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('YYYY-MM-DD')
 			hora = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('HH:mm:ss')
-                
-            console.log("hora con segundos " + hora)
+            
+            // Esta condicion hace que si son piezas malas las combierta de kgs a metros, 
+            if (evento.razon_calidad > 1) {
+                evento.valor = evento.valor * 160.46213093709884467265725288832 // 6.232 = 1 km de cable
+            }
 
             promisePool.getConnection().then(function(connection) {
                 
                 connection.query("select 1 from dual").then(function(rows){
 
-                    // TODO: de momento va a estar hardcodeado el productos_id pero hay que arreglar esta parte
+                    // Salva el incremento de piezas buenas o malas normalmente
                     var save  = {
                         operacion_uuid: 'incremento',  
                         fecha: fecha, 
@@ -894,14 +897,33 @@ module.exports = function(io) {
                         maquinas_id: evento.maquina_id,
                         productos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajadoproductos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajado
                         razones_paro_id: 1,
-                        //razones_calidad_id: 1 // Workaround para la aplicacion vieja
                         razones_calidad_id: evento.razon_calidad // Se guarda 1 (Pieza buena) porque aqui vamos a medir TA/TM solamente pero el campo es not null TODO: Mejorar esto
                     };
 
-                    //log.debug(save)
-
                     var result = connection.query("INSERT INTO eventos2 SET ?", save)
-                    // TODO: Confirmar que se guardo la info ?
+
+                    // Esta condicion hace que si son piezas malas las combierta a metros, 
+                    if (evento.razon_calidad > 1) {
+
+                        evento.valor = pos_to_neg(evento.valor)
+
+                        var save  = {
+                            operacion_uuid: 'incremento',  
+                            fecha: fecha, 
+                            hora: hora,
+                            valor: evento.valor,
+                            plantas_id: evento.planta_id,
+                            areas_id: evento.area_id,
+                            maquinas_id: evento.maquina_id,
+                            productos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajadoproductos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajado
+                            razones_paro_id: 1,
+                            //razones_calidad_id: 1 // Workaround para la aplicacion vieja
+                            razones_calidad_id: 1 // Se guarda el decremento de las piezas
+                        };
+    
+                        var result = connection.query("INSERT INTO eventos2 SET ?", save)
+                    }
+
                     return result
 
                 }).then(function(rows){
@@ -1074,6 +1096,7 @@ module.exports = function(io) {
             });
         });
 
+        // TODO: ver si se va a borrar este evento, ya que todos los incrementos (negativos y positivos) se reciben en el incremento 1
         socket.on('agregar-scrap', function (json) {
 
             log.info("Se recibio scrap " + json)
