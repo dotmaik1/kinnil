@@ -137,7 +137,7 @@ exports.getDashboard = function(done) {
             sum(e.valor) piezas, \
             sum(e.tiempo) tiempo, \
             sum(e.valor)/(sum(e.tiempo)/60/60) realidad, \
-            (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
+            ((sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento)*100 rendimiento \
             from eventos2 e \
             inner join productos p on e.productos_id = p.id \
             where CASE \
@@ -248,6 +248,7 @@ exports.getReportesInfo = function(done) {
         }).then(function(rows){
             return_data.maquinas = rows
             
+            log.debug("se calcularon bien todos los queries")
             // Suelta la conexion ejemplo: Connection 404 released
             //connection.release();
             // Parece que funciona igual al de arriba. Hay que probarlo en desarrollo
@@ -266,6 +267,7 @@ exports.getReportesInfo = function(done) {
             http://bender.io/2013/09/22/returning-hierarchical-data-in-a-single-sql-query/
             http://blog.tcs.de/creating-trees-from-sql-queries-in-javascript/*/
 
+            log.debug("inicio de la estructura del json")
             // Objeto donde se va a guardar toda la confirguacion.
             var json = {plantas : []}
 
@@ -308,7 +310,12 @@ exports.getReportesInfo = function(done) {
                 }
             }
 
+            log.debug("fin de la estructura del json")
+
             console.log(JSON.stringify(json))
+
+            log.debug("se mando la estructura del json completa")
+            log.debug(json)
 
             return done(null, return_data, json)
             

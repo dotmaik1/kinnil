@@ -209,7 +209,7 @@
                                 <div class="col-md-3">
                                     <h2 class="text-center" id="oee">
                                         <%if (calidad[0] && rendimiento[0] && disponibilidad[0]) { %>
-                                            <%= (calidad[0].calidad * rendimiento[0].rendimiento * disponibilidad[0].disponibilidad).toFixed(2) %> %
+                                            <%= (((calidad[0].calidad/100) * (rendimiento[0].rendimiento/100) * (disponibilidad[0].disponibilidad/100))*100).toFixed(2) %> %
                                         <% } else{ %> 
                                             0%
                                         <% } %>
@@ -259,18 +259,18 @@
                                 <div class="col-md-3">
                                     <h2 class="text-center" id="pt">
                                         <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                            <%= calidad[0].pt %> pzas
+                                            <%= calidad[0].pt %> mts
                                         <% } else{ %> 
-                                            0 pzas
+                                            0 mts
                                         <% } %>
                                     </h2>
                                 </div>
                                 <div class="col-md-3">
                                     <h2 class="text-center" id="scrap">
                                         <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                            <%= (calidad[0].scrap).toFixed(2) %> pzas
+                                            <%= (calidad[0].scrap).toFixed(2) %> mts
                                         <% } else{ %> 
-                                            0 pzas
+                                            0 mts
                                         <% } %>
                                     </h2>
                                 </div>
@@ -364,9 +364,9 @@
             // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
             if (message.calidad.length > 0) { 
                 $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
-                $("#pt").html(message.calidad[0].pt + " pzas"); // Pieza terminada no esta con decimales porque nunca lleva
-                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
-                //$("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
+                $("#pt").html(message.calidad[0].pt + " mts"); // Pieza terminada no esta con decimales porque nunca lleva
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " mts");
+                //$("#total").html((message.calidad[0].total).toFixed(2) + " mts");
             }
             else {
                 $("#calidad").html("0%");
@@ -375,7 +375,7 @@
             // Calcula el OEE disponibilidad + rendimiento + calidad
             // TODO: Penzar esto un poco mas porque asi si sale un numero degativo se va a desplegar 0%
             if (message.disponibilidad.length > 0 && message.rendimiento.length > 0 && message.calidad.length > 0)
-                $("#oee").html(((message.disponibilidad[0].disponibilidad + message.rendimiento[0].rendimiento + message.calidad[0].calidad)/3).toFixed(2)  + " %");
+                $("#oee").html((((message.disponibilidad[0].disponibilidad/100) * (message.rendimiento[0].rendimiento/100) * (message.calidad[0].calidad/100))*100).toFixed(2)  + " %");
             else
                 $("#oee").html("0%");
 

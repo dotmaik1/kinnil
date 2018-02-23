@@ -312,7 +312,7 @@ module.exports = function(io) {
                             sum(e.valor) piezas, \
                             sum(e.tiempo) tiempo, \
                             sum(e.valor)/(sum(e.tiempo)/60/60) realidad, \
-                            (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
+                            ((sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento)*100 rendimiento \
                             from eventos2 e \
                             inner join productos p on e.productos_id = p.id \
                             where CASE \
@@ -485,7 +485,7 @@ module.exports = function(io) {
                     sum(e.valor) piezas, \
                     sum(e.tiempo) tiempo, \
                     sum(e.valor)/(sum(e.tiempo)/60/60) realidad, \
-                    (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
+                    ((sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento)*100 rendimiento \
                     from eventos2 e \
                     inner join productos p on e.productos_id = p.id \
                     where CASE \
@@ -701,7 +701,7 @@ module.exports = function(io) {
                     sum(e.valor) piezas, \
                     sum(e.tiempo) tiempo, \
                     sum(e.valor)/(sum(e.tiempo)/60/60) realidad, \
-                    (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
+                    ((sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento)*100 rendimiento \
                     from eventos2 e \
                     inner join productos p on e.productos_id = p.id \
                     " + where + " \
@@ -894,8 +894,8 @@ module.exports = function(io) {
                         maquinas_id: evento.maquina_id,
                         productos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajadoproductos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajado
                         razones_paro_id: 1,
-                        razones_calidad_id: 1 // Workaround para la aplicacion vieja
-                        //razones_calidad_id: evento.razon_calidad // Se guarda 1 (Pieza buena) porque aqui vamos a medir TA/TM solamente pero el campo es not null TODO: Mejorar esto
+                        //razones_calidad_id: 1 // Workaround para la aplicacion vieja
+                        razones_calidad_id: evento.razon_calidad // Se guarda 1 (Pieza buena) porque aqui vamos a medir TA/TM solamente pero el campo es not null TODO: Mejorar esto
                     };
 
                     //log.debug(save)
@@ -1006,7 +1006,7 @@ module.exports = function(io) {
                             sum(e.valor) piezas, \
                             sum(e.tiempo) tiempo, \
                             sum(e.valor)/(sum(e.tiempo)/60/60) realidad, \
-                            (sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento rendimiento \
+                            ((sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento)*100 rendimiento \
                             from eventos2 e \
                             inner join productos p on e.productos_id = p.id \
                             where CASE \
@@ -1085,8 +1085,8 @@ module.exports = function(io) {
 
             valor = valor * 160.46213093709884467265725288832 // 6.232 = 1 km de cable
 
-            // 6.232 kgs = 1000 pzas
-            // 1kgs      = 160.46213093709884467265725288832 pzas
+            // 6.232 kgs = 1000 mts
+            // 1kgs      = 160.46213093709884467265725288832 mts
 
             console.log(planta + " " + area + " " + maquina + " " + valor);
 

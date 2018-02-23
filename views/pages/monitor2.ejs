@@ -256,9 +256,9 @@
                             <h2>Piezas terminadas: 
                                 <span id="pt">
                                     <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                        <%= calidad[0].pt %> pzas
+                                        <%= calidad[0].pt %> mts
                                     <% } else{ %> 
-                                        0 pzas
+                                        0 mts
                                     <% } %>
                                 </span>
                             </h2>
@@ -269,9 +269,9 @@
                             <h2>Scrap: 
                                 <span id="scrap">
                                     <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                        <%= (calidad[0].scrap).toFixed(2) %> pzas
+                                        <%= (calidad[0].scrap).toFixed(2) %> mts
                                     <% } else{ %> 
-                                        0 pzas
+                                        0 mts
                                     <% } %>
                                 </span>
                             </h2>
@@ -378,9 +378,9 @@
             // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
             if (message.calidad.length > 0) { 
                 $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
-                $("#pt").html(message.calidad[0].pt + " pzas"); // Pieza terminada no esta con decimales porque nunca lleva
-                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
-                //$("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
+                $("#pt").html(message.calidad[0].pt + " mts"); // Pieza terminada no esta con decimales porque nunca lleva
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " mts");
+                //$("#total").html((message.calidad[0].total).toFixed(2) + " mts");
             }
             else {
                 $("#calidad").html("0%");

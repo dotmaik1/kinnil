@@ -167,28 +167,29 @@
                                         </td>
                                         <td id="pt">
                                             <%if (calidad[i] && calidad[0].calidad !== null) { %>
-                                                <%= calidad[i].pt %> pzas
+                                                <%= calidad[i].pt %> mts
                                             <% } else{ %> 
-                                                0 pzas
+                                                0 mts
                                             <% } %>
                                         </td>
                                         <td id="scrap" >
                                             <%if (calidad[i] && calidad[0].calidad !== null) { %>
-                                                <%= (calidad[i].scrap).toFixed(2) %> pzas
+                                                <%= (calidad[i].scrap).toFixed(2) %> mts
                                             <% } else{ %> 
-                                                0 pzas
+                                                0 mts
                                             <% } %>
                                         </td>
                                         <td id="total" >
                                             <%if (calidad[i] && calidad[0].calidad !== null) { %>
-                                                <%= (calidad[i].total).toFixed(2) %> pzas
+                                                <%= (calidad[i].total).toFixed(2) %> mts
                                             <% } else{ %> 
-                                                0 pzas
+                                                0 mts
                                             <% } %>
                                         </td>
                                         <td id="oee">
                                             <%if (calidad[i] && rendimiento[i] && disponibilidad[i]) { %>
-                                                <%= (calidad[i].calidad * rendimiento[i].rendimiento * disponibilidad[i].disponibilidad).toFixed(2) %> %
+                                                <%= ((calidad[i].calidad + rendimiento[i].rendimiento + disponibilidad[i].disponibilidad)/3).toFixed(2) %> %
+                                                <%= (((calidad[i].calidad/100) * (rendimiento[i].rendimiento/100) * (disponibilidad[i].disponibilidad/100))*100).toFixed(2) %> %
                                             <% } else{ %> 
                                                 0%
                                             <% } %>
@@ -296,9 +297,9 @@
             // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
             if (message.calidad.length > 0) { 
                 $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
-                $("#pt").html(message.calidad[0].pt + " pzas");
-                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
-                $("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
+                $("#pt").html(message.calidad[0].pt + " mts");
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " mts");
+                $("#total").html((message.calidad[0].total).toFixed(2) + " mts");
             }
             else {
                 $("#calidad").html("0%");
@@ -307,7 +308,8 @@
             // Calcula el OEE disponibilidad + rendimiento + calidad
             // TODO: Penzar esto un poco mas porque asi si sale un numero degativo se va a desplegar 0%
             if (message.disponibilidad.length > 0 && message.rendimiento.length > 0 && message.calidad.length > 0)
-                $("#oee").html(((message.disponibilidad[0].disponibilidad + message.rendimiento[0].rendimiento + message.calidad[0].calidad)/3).toFixed(2)  + " %");
+            $("#oee").html(((message.disponibilidad[0].disponibilidad + message.rendimiento[0].rendimiento + message.calidad[0].calidad)/3).toFixed(2)  + " %");
+                $("#oee").html((((message.disponibilidad[0].disponibilidad/100) * (message.rendimiento[0].rendimiento/100) * (message.calidad[0].calidad/100))*100).toFixed(2)  + " %");
             else
                 $("#oee").html("0%");
 
