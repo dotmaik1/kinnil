@@ -125,10 +125,10 @@
                                         <td id="temperatura"></td>
                                         <td id="conductividad"></td>
                                         <td id="digital1" class="<%if (digital[0]) { %> <%= digital[0].activo == '0' ? " green " : "red " %> <% } %>">
-                                            
+                                            <div id="digital1">00:00</div>
                                         </td>
                                         <td id="digital2" class="<%if (digital[1]) { %> <%= digital[1].activo == '0' ? " green " : "red " %> <% } %>">
-                                            
+                                            <div id="digital2">00:00</div>
                                         </td>
                                         <td id="disponibilidad">
                                             <%if (disponibilidad[i] && disponibilidad[0].disponibilidad !== null) { %>
@@ -188,7 +188,6 @@
                                         </td>
                                         <td id="oee">
                                             <%if (calidad[i] && rendimiento[i] && disponibilidad[i]) { %>
-                                                <%= ((calidad[i].calidad + rendimiento[i].rendimiento + disponibilidad[i].disponibilidad)/3).toFixed(2) %> %
                                                 <%= (((calidad[i].calidad/100) * (rendimiento[i].rendimiento/100) * (disponibilidad[i].disponibilidad/100))*100).toFixed(2) %> %
                                             <% } else{ %> 
                                                 0%
@@ -220,6 +219,7 @@
    </script> 
    <script src="/socket.io/socket.io.js">
    </script> 
+   <script src="./js//easytimer.min.js"></script>
    <script>
         
         // dev.kinnilweb.com
@@ -323,13 +323,27 @@
             message = JSON.parse(message);
 
             if (message.valor == 0){
-                 //console.log('verde');
-                 $('#digital1').addClass('green');
-                 $('#digital1').removeClass('red');
+                //console.log('verde');
+                $('#digital1').addClass('green');
+                $('#digital1').removeClass('red');
+
+                var timer = new Timer();
+                timer.stop();
+                timer.reset();
+                timer.addEventListener('secondsUpdated', function (e) {
+                    $('#digital1').html(timer.getTimeValues().toString(['minutes', 'seconds']));
+                });
+
              } else {
-                 //console.log('rojo');
-                 $('#digital1').addClass('red');
-                 $('#digital1').removeClass('green');
+                //console.log('rojo');
+                $('#digital1').addClass('red');
+                $('#digital1').removeClass('green');
+
+                var timer = new Timer();
+                timer.start();
+                timer.addEventListener('secondsUpdated', function (e) {
+                    $('#digital1').html(timer.getTimeValues().toString(['minutes', 'seconds']));
+                });
              }
         })
 
@@ -339,20 +353,36 @@
             message = JSON.parse(message);
 
             if (message.valor == 0){
-                 //console.log('verde');
-                 $('#digital2').addClass('green');
-                 $('#digital2').removeClass('red');
+                //console.log('verde');
+                $('#digital2').addClass('green');
+                $('#digital2').removeClass('red');
+
+                var timer = new Timer();
+                timer.stop();
+                timer.reset();
+                timer.addEventListener('secondsUpdated', function (e) {
+                    $('#digital2').html(timer.getTimeValues().toString(['minutes', 'seconds']));
+                });
+
              } else {
-                 //console.log('rojo');
-                 $('#digital2').addClass('red');
-                 $('#digital2').removeClass('green');
+                //console.log('rojo');
+                $('#digital2').addClass('red');
+                $('#digital2').removeClass('green');
+
+                var timer = new Timer();
+                timer.start();
+                timer.addEventListener('secondsUpdated', function (e) {
+                    $('#digital2').html(timer.getTimeValues().toString(['minutes', 'seconds']));
+                });
              }
         })
 
    </script> 
    <%include ../partials/js %>
    <script>
-       //$("#eventos").bootgrid();
+       $(function() {
+            
+       });
    </script>
 </body>
 </html>
