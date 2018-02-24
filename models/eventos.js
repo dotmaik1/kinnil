@@ -55,6 +55,8 @@ exports.getDashboard = function(done) {
         log.info(fecha)
         log.info(hora)
 
+        var where = " WHERE "
+
         // TODO: Hacer algo!!! -> Se muestra la ultima informacion guardada en la DB (activo/inactivo) Pero de eso pudo haber pasado mucho rato si no se ha agregado un cambio nuevo (necesitare agregar algo que verifique el ultimo estatus?????)
         // Turno actual, nos va a servir para obtener la informacion del turno en cuestion
         // TODO: agregar el problema con el turno de tercera, si esta de noche este query no me da resultados (empty set) y no me muestra la pagina
@@ -72,6 +74,18 @@ exports.getDashboard = function(done) {
 
         .then(function(rows){
             return_data.turnoActual = rows
+
+            
+            if (return_data.turnoActual[0].inicio < return_data.turnoActual[0].fin) {
+                where += "e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time) "
+            } else {
+                if (hora >= return_data.turnoActual[0].inicio) {
+                    where += "e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) "
+                } else {
+                    where += "(e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
+                    OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) "
+                }
+            }
             
             // TODO: A todos estos queries hay que agregar la opcion para que vean el turno de 3ra para que no fallen
             // TA, TM, Disponibillidad Real, Sin disponibilidad Meta. Agrupado por maquina
@@ -81,23 +95,22 @@ exports.getDashboard = function(done) {
             sum(case when activo=0 then tiempo else 0 end) tm, \
             (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
             from eventos2 e \
-            where CASE \
-                    when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
-                    then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
-                    ELSE \
-                        CASE \
-                        when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                            then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                            ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
-                                    OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
-                        END \
-                    END \
+            " + where + " \
             group by maquinas_id") 
+
+            console.log("select maquinas_id, \
+            sum(case when activo=1 then tiempo else 0 end) ta, \
+            sum(case when activo=0 then tiempo else 0 end) tm, \
+            (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
+            from eventos2 e \
+            " + where + " \
+            group by maquinas_id")
 
             return result
         }).then(function(rows){
             return_data.disponibilidad = rows
 
+            // TODO: no esta utilizando ningun indice, hay que crearle uno o varios
             // TODO: Agrer el active = 1 a todos estos queries para evitar informacion inutil
             // Informacion agrupada por maquina (id del eventos2, activo, razon, producto, maquina)
             var result = connection.query("select e1.id as id, \
@@ -140,19 +153,11 @@ exports.getDashboard = function(done) {
             ((sum(e.valor)/(sum(e.tiempo)/60/60))/p.rendimiento)*100 rendimiento \
             from eventos2 e \
             inner join productos p on e.productos_id = p.id \
-            where CASE \
-            when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
-            then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
-                ELSE \
-                    CASE \
-                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
-                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
-                    END \
-                END \
+            " + where + " \
             group by p.id, e.maquinas_id) sub \
             group by maquina") 
+
+            console.log(where);
             return result
         }).then(function(rows){ 
             return_data.rendimiento = rows
@@ -166,17 +171,7 @@ exports.getDashboard = function(done) {
             sum(case when e.razones_calidad_id = 1 then e.valor else 0 end) * 100 / sum(e.valor) / p.calidad calidad \
             from eventos2 e \
             inner join productos p on e.productos_id = p.id \
-            where CASE \
-                when CAST('"+ return_data.turnoActual[0].inicio +"' as time) < CAST('"+ return_data.turnoActual[0].fin +"' as time) \
-                then (e.fecha = CAST('" + fecha + "' as date) and e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
-                ELSE \
-                    CASE \
-                    when CAST('" + hora + "' as time) >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                        then e.fecha = CAST('" + fecha + "' as date) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time) \
-                        ELSE (e.fecha = DATE_SUB(CAST('" + fecha + "' as date), INTERVAL 1 DAY) AND e.hora >= CAST('"+ return_data.turnoActual[0].inicio +"' as time)) \
-                                OR (e.fecha = CAST('" + fecha + "' as date) and e.hora < CAST('"+ return_data.turnoActual[0].fin +"' as time)) \
-                    END \
-                END \
+            " + where + " \
             group by p.calidad, e.maquinas_id) sub \
             group by maquina")
             

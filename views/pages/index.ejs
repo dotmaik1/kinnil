@@ -308,7 +308,6 @@
             // Calcula el OEE disponibilidad + rendimiento + calidad
             // TODO: Penzar esto un poco mas porque asi si sale un numero degativo se va a desplegar 0%
             if (message.disponibilidad.length > 0 && message.rendimiento.length > 0 && message.calidad.length > 0)
-            $("#oee").html(((message.disponibilidad[0].disponibilidad + message.rendimiento[0].rendimiento + message.calidad[0].calidad)/3).toFixed(2)  + " %");
                 $("#oee").html((((message.disponibilidad[0].disponibilidad/100) * (message.rendimiento[0].rendimiento/100) * (message.calidad[0].calidad/100))*100).toFixed(2)  + " %");
             else
                 $("#oee").html("0%");
