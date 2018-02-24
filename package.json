@@ -19,6 +19,8 @@
     "moment-timezone": "^0.5.14",
     "morgan": "^1.6.0",
     "mysql": "^2.14.1",
+    "node-cron": "^1.2.1",
+    "nodemailer": "^4.6.0",
     "passport": "^0.2.2",
     "passport-local": "^1.0.0",
     "promise-mysql": "^3.1.1",

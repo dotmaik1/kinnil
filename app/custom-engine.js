@@ -9,7 +9,7 @@ var promiseMysql = require('promise-mysql');
 var dbconfig = require('../config/database');
 
 var promisePool = promiseMysql.createPool(dbconfig.connection);
-promisePool.query('USE ' + dbconfig.database); // TODO: provar que la base no se deseleccione, pruebas intensivas
+promisePool.query('USE ' + dbconfig.database);
 
 var fs = require('fs')
   , Log = require('log')
