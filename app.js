@@ -19,6 +19,9 @@ var favicon = require('serve-favicon');
 // Sirve para loguear la salida a otro lado que no sea la consola
 var fs = require('fs')
 
+// Alertas para correos
+
+
 // Look, a performance monitor tool
 // TODO: Make this work
 //require('look').start();
@@ -65,6 +68,9 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 
 // routes ======================================================================
 var index = require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+
+// alertas de correo ===========================================================
+var alerts = require('./app/alerts.js')()
 
 module.exports = app;
 

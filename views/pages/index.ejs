@@ -316,6 +316,8 @@
             //console.log('se recibio un valor: ' + mensaje);
         })
 
+        var timer = new Timer();
+
         socket.on('digital1', function(message) {
 
             //console.log("llego un evento digital1: " +message);
@@ -325,20 +327,15 @@
                 //console.log('verde');
                 $('#digital1').addClass('green');
                 $('#digital1').removeClass('red');
+                $('#digital1').html("00:00");
 
-                var timer = new Timer();
-                timer.stop();
                 timer.reset();
-                timer.addEventListener('secondsUpdated', function (e) {
-                    $('#digital1').html(timer.getTimeValues().toString(['minutes', 'seconds']));
-                });
-
+                timer.stop();
              } else {
                 //console.log('rojo');
                 $('#digital1').addClass('red');
                 $('#digital1').removeClass('green');
 
-                var timer = new Timer();
                 timer.start();
                 timer.addEventListener('secondsUpdated', function (e) {
                     $('#digital1').html(timer.getTimeValues().toString(['minutes', 'seconds']));
@@ -346,32 +343,29 @@
              }
         })
 
+        var timer2 = new Timer(); 
+
         socket.on('digital2', function(message) {
 
-            //console.log("llego un evento digital2: " +message);
             message = JSON.parse(message);
 
             if (message.valor == 0){
                 //console.log('verde');
                 $('#digital2').addClass('green');
                 $('#digital2').removeClass('red');
+                $('#digital2').html("00:00");
 
-                var timer = new Timer();
-                timer.stop();
-                timer.reset();
-                timer.addEventListener('secondsUpdated', function (e) {
-                    $('#digital2').html(timer.getTimeValues().toString(['minutes', 'seconds']));
-                });
-
+                
+                timer2.reset();
+                timer2.stop();
              } else {
                 //console.log('rojo');
                 $('#digital2').addClass('red');
                 $('#digital2').removeClass('green');
 
-                var timer = new Timer();
-                timer.start();
-                timer.addEventListener('secondsUpdated', function (e) {
-                    $('#digital2').html(timer.getTimeValues().toString(['minutes', 'seconds']));
+                timer2.start();
+                timer2.addEventListener('secondsUpdated', function (e) {
+                    $('#digital2').html(timer2.getTimeValues().toString(['minutes', 'seconds']));
                 });
              }
         })
