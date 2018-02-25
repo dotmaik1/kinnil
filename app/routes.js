@@ -6,6 +6,8 @@ var async = require('async'); // TODO: ver si hay que elimiar async, porque ya n
 var promiseMysql = require('promise-mysql');
 var dbconfig = require('../config/database');
 
+var bcrypt = require('bcrypt-nodejs')
+
 var Eventos = require('../models/eventos')
 
 var promisePool = promiseMysql.createPool(dbconfig.connection);
@@ -394,23 +396,33 @@ module.exports = function(app, passport) {
 				var role = req.body.role
 				var nivel = req.body.nivel
 				
-				var usuario  = {username: username, password: password, email: email, role: role, nivel: nivel};
+				password = bcrypt.hashSync(password, null, null)
+
 				promisePool.getConnection().then(function(connection) {
-						connection.query('INSERT INTO users SET ?', usuario).then(function(rows){
+					connection.query('SELECT * FROM users WHERE username = ?',[username]).then(function(rows){
+						if (rows.length) {
+							console.log('That username is already taken.')
+						} else {
 
-							// Suelta la conexion ejemplo: Connection 404 released
-							//connection.release();
-							// Parece que funciona igual al de arriba. Hay que probarlo en desarrollo
-							promisePool.releaseConnection(connection);
+							// TODO: probar si puedo crear nuevos usuarios
+							var data = {username: username, password:password, email: email, role: role, nivel: nivel}
+	
+							promisePool.getConnection().then(function(connection) {
+								connection.query('INSERT INTO users SET ?', data).then(function(rows){
+									console.log('se agrego el usuario')
+								}).catch(function(err) {
+									console.log('error al agregar el usuario ' +err)
+								});
+							});
+						}
 
-							// TODO: crear las razones de paro para ese producto. Insertar las en la DB, todas las que sean default. poner una area para definir las default.....!?
-							// TODO: ver si agregar un area para definir las razones de calidad, y ver si se tienen que inertar por default, preguntar a ricardo
-							// return_data.turnos = rows
 					}).catch(function(err) {
-						// TODO: cambiar los console.log por un buen sistema de logueo de errores
-						console.log(err);
+						console.log('error al buscar el usuario a agregar' +err)
 					});
+					// TODO: ver que el codigo si llegue a esta parte y que se cierre la conexion
+					connection.release();
 				});
+				
 				break;
 			default:
 				console.log("default");

@@ -91,7 +91,8 @@ module.exports = function(passport) {
                 }).catch(function(err) {
                     return done(err)
                 });
-                connection.release(); // TODO: ver que el codigo si llegue a esta parte y que se cierre la conexion
+                // TODO: ver que el codigo si llegue a esta parte y que se cierre la conexion
+                connection.release();
             });
         })
     );
