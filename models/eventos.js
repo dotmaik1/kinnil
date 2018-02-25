@@ -736,6 +736,22 @@ exports.deleteTurno = function(pk, done) {
     });
 }
 
+exports.deleteUsers= function(pk, done) {
+    
+    promisePool.getConnection().then(function(connection) {
+        connection.query('DELETE from users where id = ' + pk).then(function(rows){
+                promisePool.releaseConnection(connection);
+        }).then(function(rows) {
+            return done(null, true);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
 // TODO: el siguiente codigo no funciona.
 exports.postConfiguracion = function(tipo, done) {
         // TODO: Este codigo puede ser mejorado hay que refactorizarlo o modificarlo de plano

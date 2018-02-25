@@ -333,7 +333,7 @@
                         <td><%= users[i].role %></td>
                         <td><%= users[i].nivel %></td>
                         <td>
-                                <button id="" class="btn btn-danger btn-delete btn-xs"><span class="glyphicon glyphicon-trash"></span>TODO</button>
+                            <button id="delete-users-<%= users[i].id %>" class="btn btn-danger btn-delete btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
                         </td>
                         </tr><%} %>
                     </table><%} else {%>
@@ -1034,44 +1034,92 @@
         </script>
     <%} %>
     <%} %>
+
+    <!-- 
+        Eliminar turnos
+    -->
     <%if(turnos.length>0){%> 
     <%for(var i=0; i<turnos.length; i++) {%> 
-        <script>
-                $(document).ready(function() {
-                    // Para refrescar la pagina una vez que se halla echo un cambio
-                    function sleep(ms) {
-                        return new Promise(resolve => setTimeout(resolve, ms));
-                    }
-    
-                    async function refreshPage() {
-                        console.log('Taking a break...');
-                        await sleep(2000);
-                        console.log('Two second later');
-                        location.reload();
-                    }
-                    
-                    $('#delete-turnos-<%= turnos[i].id %>').click(function(){
-                        var result = confirm("Quieres borrar: <%= turnos[i].nombre %>?");
-                        if (result) {
-                            console.log("se va a borrar :(");
-    
-                            $.ajax({
-                                type: "DELETE",
-                                url: "/configuracion/turnos/<%= turnos[i].id %>",
-                                success: function(text) {
-                                    //console.log("si se hiso el insert"); // TODO Hay que agregar una mejor forma de login
-                                    if (text == "success") { ///// TODO: Hay que ver que pedo porque este success no funciona.
-                                        //alert("sea armo si se guardo"); // This is weird porque no se pone .
-                                        console.log("vamos a ver si se booro");
-                                    }
+    <script>
+            $(document).ready(function() {
+                // Para refrescar la pagina una vez que se halla echo un cambio
+                function sleep(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+
+                async function refreshPage() {
+                    console.log('Taking a break...');
+                    await sleep(2000);
+                    console.log('Two second later');
+                    location.reload();
+                }
+                
+                $('#delete-turnos-<%= turnos[i].id %>').click(function(){
+                    var result = confirm("Quieres borrar: <%= turnos[i].nombre %>?");
+                    if (result) {
+                        console.log("se va a borrar :(");
+
+                        $.ajax({
+                            type: "DELETE",
+                            url: "/configuracion/turnos/<%= turnos[i].id %>",
+                            success: function(text) {
+                                //console.log("si se hiso el insert"); // TODO Hay que agregar una mejor forma de login
+                                if (text == "success") { ///// TODO: Hay que ver que pedo porque este success no funciona.
+                                    //alert("sea armo si se guardo"); // This is weird porque no se pone .
+                                    console.log("vamos a ver si se booro");
                                 }
-                            });
-                            refreshPage();
-                        }
-                    });
-    
+                            }
+                        });
+                        refreshPage();
+                    }
                 });
-        </script>
+
+            });
+    </script>
+    <%} %>
+    <%} %>
+
+        <!-- 
+        Eliminar turnos
+    -->
+    <%if(users.length>0){%> 
+    <%for(var i=0; i<users.length; i++) {%> 
+    <script>
+            $(document).ready(function() {
+                // Para refrescar la pagina una vez que se halla echo un cambio
+                function sleep(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+
+                async function refreshPage() {
+                    console.log('Taking a break...');
+                    await sleep(2000);
+                    console.log('Two second later');
+                    location.reload();
+                }
+                
+                $('#delete-users-<%= users[i].id %>').click(function(){
+                    var result = confirm("Quieres borrar: <%= users[i].username %>?");
+                    if (result) {
+                        console.log("se va a borrar :(");
+
+                        $.ajax({
+                            type: "DELETE",
+                            url: "/configuracion/users/<%= users[i].id %>",
+                            success: function(text) {
+                                //console.log("si se hiso el insert"); // TODO Hay que agregar una mejor forma de login
+                                if (text == "success") { ///// TODO: Hay que ver que pedo porque este success no funciona.
+                                    //alert("sea armo si se guardo"); // This is weird porque no se pone .
+                                    console.log("vamos a ver si se booro");
+                                }
+                            }
+                        });
+                        refreshPage();
+                    }
+                });
+
+            });
+    </script>
     <%} %>
     <%} %>
 

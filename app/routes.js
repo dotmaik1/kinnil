@@ -518,7 +518,9 @@ module.exports = function(app, passport) {
 	});
 
 	
-
+	/*
+	* Deleted
+	*/
 	
 
 	/*
@@ -619,6 +621,21 @@ module.exports = function(app, passport) {
 	app.delete('/configuracion/turnos/:turnoId', isLoggedIn, function(req, res) {
 		
 		Eventos.deleteTurno(req.params.turnoId, function(err, actualizado) {
+			//console.log(actualizado)
+			if (actualizado) {
+				res.sendStatus(200); // Manda una respuesta OK, si si se pudo actualizar la fila
+			} else {
+				res.sendStatus(400); // Manda no ok si hubo algun error
+			}
+		})
+	});
+
+	/*
+	* Borrar usuarios - solo las desactivamos :) (active = false in MySql)
+	*/
+	app.delete('/configuracion/users/:usersId', isLoggedIn, function(req, res) {
+		
+		Eventos.deleteUsers(req.params.usersId, function(err, actualizado) {
 			//console.log(actualizado)
 			if (actualizado) {
 				res.sendStatus(200); // Manda una respuesta OK, si si se pudo actualizar la fila
