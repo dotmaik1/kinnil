@@ -214,8 +214,8 @@
             </div>
             <!-- TODO: Agregar una validaciones para cuando no hay plantas dadas de alta y se quiere agregar un producto -->
             <div class="form-group">
-                <label for="message" class="h4 ">Notas</label>
-                <select id="plantaId" class="form-control" >
+                <label for="idPlantaAddProductos" class="h4 ">Planta</label>
+                <select id="idPlantaAddProductos" class="form-control" >
                     <% if(plantas.length>0){%>
                     <% for(var i=0; i<plantas.length; i++) {%>
                     <option value = "<%= plantas[i].id %>"><%= plantas[i].nombre %></option>

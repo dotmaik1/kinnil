@@ -346,7 +346,7 @@ module.exports = function(app, passport) {
 				var disponibilidad = req.body.disponibilidad
 				var rendimiento = req.body.rendimiento
 				var calidad = req.body.calidad
-				var plantas_id = req.body.plantaId // TODO: Probar esta parte
+				var plantas_id = req.body.planta // TODO: Probar esta parte
 
 				var producto  = {nombre: nombre, disponibilidad: disponibilidad, rendimiento: rendimiento, calidad: calidad, activo: true, plantas_id:plantas_id};
 				promisePool.getConnection().then(function(connection) {

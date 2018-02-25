@@ -548,6 +548,7 @@
                         var disponibilidad = $("#addProductosDisponibilidad").val();
                         var rendimiento = $('#addProductosRendimiento').val();
                         var calidad = $("#addProductosCalidad").val();
+                        var planta = $("#idPlantaAddProductos").val();
                         var tipo = "agregarProductos";
                         
 
@@ -555,7 +556,7 @@
                             type: "POST",
                             url: "/configuracion",
                             //data: "nombre=" + nombre + "&notas=" + notas + "&tipo=" + tipo, // TOODO: por si se necesitan agregar las notas de las plantas
-                            data: "nombre=" + nombre + "&tipo=" + tipo + "&disponibilidad=" + disponibilidad + "&rendimiento=" + rendimiento + "&calidad=" + calidad,
+                            data: "nombre=" + nombre + "&tipo=" + tipo + "&disponibilidad=" + disponibilidad + "&rendimiento=" + rendimiento + "&calidad=" + calidad + "&planta=" + planta,
                             dataType: 'text',
                             success: function(text) {
                                 console.log("si se hiso el insert");
