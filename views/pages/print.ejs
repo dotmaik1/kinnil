@@ -1,0 +1,204 @@
+<!doctype>
+<html>
+<head>
+    <title>jsPDF</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<style>
+		@CHARSET "UTF-8";
+		.page-break {
+			page-break-after: always;
+			page-break-inside: avoid;
+			clear:both;
+		}
+		.page-break-before {
+			page-break-before: always;
+			page-break-inside: avoid;
+			clear:both;
+		}
+    </style>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Task', 'Hours per Day'],
+          ['Work',     11],
+          ['Eat',      2],
+          ['Commute',  2],
+          ['Watch TV', 2],
+          ['Sleep',    7]
+        ]);
+
+        var options = {
+          title: 'My Daily Activities'
+        };
+
+        var chart_div = document.getElementById('chart_div');
+        var chart = new google.visualization.PieChart(chart_div);
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        google.visualization.events.addListener(chart, 'ready', function () {
+            var content = '<img src="' + chart.getImageURI() + '">';
+            $('#graph-images').append(content);
+
+        });
+
+        chart.draw(data, options);
+
+
+
+      }
+    </script>
+ </head>
+<body>
+    <button onclick="generate()">Generate PDF</button>
+    
+    <div id='chart_div'></div>
+<div id="html-2-pdfwrapper" style='position: absolute; left: 20px; top: 50px; bottom: 0; overflow: auto; width: 600px'>
+
+		<h1>Html2Pdf</h1>
+		<p>
+			This demo uses Html2Canvas.js to render HTML. <br />Instead of using an HTML canvas however, a canvas wrapper using jsPDF is substituted. The <em>context2d</em> provided by the wrapper calls native PDF rendering methods.
+		</p>
+
+        
+
+        
+        <div id='graph-images' style='display:none'></div>
+        
+
+
+		<h1 style='page-break-before: always; margin-top:100px;'>Page Two</h1>
+		<p>
+			This demo uses Html2Canvas.js to render HTML. <br />Instead of using an HTML canvas however, a canvas wrapper using jsPDF is substituted. The <em>context2d</em> provided by the wrapper calls native PDF rendering methods.
+		</p>
+
+        
+		
+		
+</div>
+
+<script src='./js/jspdf.min.js'></script>
+
+<script>
+var base64Img = null;
+imgToBase64('./img/logo.jpg', function(base64) {
+    base64Img = base64; 
+});
+
+margins = {
+  top: 70,
+  bottom: 40,
+  left: 30,
+  width: 550
+};
+
+generate = function()
+{
+	var pdf = new jsPDF('p', 'pt', 'letter');
+	pdf.setFontSize(18);
+	/*pdf.fromHTML(document.getElementById('html-2-pdfwrapper'), 
+		margins.left, // x coord
+		margins.top,
+		{
+			// y coord
+			width: margins.width// max width of content on PDF
+		},function(dispose) {
+			headerFooterFormatting(pdf, pdf.internal.getNumberOfPages());
+		}, 
+		margins);
+		
+	var iframe = document.createElement('iframe');
+	iframe.setAttribute('style','position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
+	document.body.appendChild(iframe);
+	
+    iframe.src = pdf.output('datauristring');
+    */
+    var img =  $('#graph-images img');
+
+
+    var yAxis = 30; 
+    var imageTags = $('#graph-images img');
+    for (var i = 0; i < imageTags.length; i++) {
+            if (i % 2 == 0 && i != 0) { // I want only two images in a page 
+                pdf.addPage();  // Adds a new page
+                yAxis = 30; // Re-initializes the value of yAxis for newly added page
+            }
+            var someText = 'Chart '+(i+1);
+            pdf.text(60, yAxis, someText); // Add some text in the PDF 
+            yAxis = yAxis + 20; // Update yAxis 
+            pdf.addImage(imageTags[i], 'png', 40, yAxis, 530, 150, undefined, 'none');
+            yAxis = yAxis+ 360; // Update yAxis 
+        }
+        var iframe = document.createElement('iframe');
+	iframe.setAttribute('style','position:absolute;right:0; top:0; bottom:0; height:100%; width:650px; padding:20px;');
+	document.body.appendChild(iframe);
+    iframe.src = pdf.output('datauristring');
+        //pdf.save('Chart_Report' + '.pdf') // Prompts user to save file on his/her machine */
+};
+function headerFooterFormatting(doc, totalPages)
+{
+    for(var i = totalPages; i >= 1; i--)
+    {
+        doc.setPage(i);                            
+        //header
+        header(doc);
+        
+        footer(doc, i, totalPages);
+        doc.page++;
+    }
+};
+
+function header(doc)
+{
+    doc.setFontSize(30);
+    doc.setTextColor(40);
+    doc.setFontStyle('normal');
+	
+    if (base64Img) {
+       doc.addImage(base64Img, 'JPEG', margins.left, 10, 120,40);        
+    }
+	    
+    doc.text("Report Header Template", margins.left + 150, 40 );
+	doc.setLineCap(2);
+	doc.line(3, 70, margins.width + 43,70); // horizontal line
+};
+
+// You could either use a function similar to this or pre convert an image with for example http://dopiaza.org/tools/datauri
+// http://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
+function imgToBase64(url, callback, imgVariable) {
+ 
+    if (!window.FileReader) {
+        callback(null);
+        return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = function() {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+			imgVariable = reader.result.replace('text/xml', 'image/jpeg');
+            callback(imgVariable);
+        };
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.send();
+};
+
+function footer(doc, pageNumber, totalPages){
+
+    var str = "Page " + pageNumber + " of " + totalPages
+   
+    doc.setFontSize(10);
+    doc.text(str, margins.left, doc.internal.pageSize.height - 20);
+    
+};
+
+ </script>
+</body>
+</html>

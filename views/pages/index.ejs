@@ -65,11 +65,7 @@
                                             <th>Estado</th>
                                             <th>Maquina</th>
                                             <th>Producto</th>
-                                            <th>PH</th>
-                                            <th>Temp</th>
-                                            <th>Cond</th>
-                                            <th>Chispa</th>
-                                            <th>Nudo</th>
+                                            
                                             <th>Disp</th>
                                             <th>TA</th>
                                             <th>TM</th>
@@ -121,15 +117,7 @@
                                                 Sin eventos
                                             <% } %>
                                         </td>
-                                        <td id="ph"></td>
-                                        <td id="temperatura"></td>
-                                        <td id="conductividad"></td>
-                                        <td id="digital1" class="<%if (digital[0]) { %> <%= digital[0].activo == '0' ? " green " : "red " %> <% } %>">
-                                            <div id="digital1">00:00</div>
-                                        </td>
-                                        <td id="digital2" class="<%if (digital[1]) { %> <%= digital[1].activo == '0' ? " green " : "red " %> <% } %>">
-                                            <div id="digital2">00:00</div>
-                                        </td>
+                                        
                                         <td id="disponibilidad">
                                             <%if (disponibilidad[i] && disponibilidad[0].disponibilidad !== null) { %>
                                                 <%= (disponibilidad[i].disponibilidad).toFixed(2) %> %
@@ -167,23 +155,23 @@
                                         </td>
                                         <td id="pt">
                                             <%if (calidad[i] && calidad[0].calidad !== null) { %>
-                                                <%= calidad[i].pt %> mts
+                                                <%= calidad[i].pt %> pzas
                                             <% } else{ %> 
-                                                0 mts
+                                                0 pzas
                                             <% } %>
                                         </td>
                                         <td id="scrap" >
                                             <%if (calidad[i] && calidad[0].calidad !== null) { %>
-                                                <%= (calidad[i].scrap).toFixed(2) %> mts
+                                                <%= (calidad[i].scrap).toFixed(2) %> pzas
                                             <% } else{ %> 
-                                                0 mts
+                                                0 pzas
                                             <% } %>
                                         </td>
                                         <td id="total" >
                                             <%if (calidad[i] && calidad[0].calidad !== null) { %>
-                                                <%= (calidad[i].total).toFixed(2) %> mts
+                                                <%= (calidad[i].total).toFixed(2) %> pzas
                                             <% } else{ %> 
-                                                0 mts
+                                                0 pzas
                                             <% } %>
                                         </td>
                                         <td id="oee">
@@ -220,14 +208,30 @@
    <script src="/socket.io/socket.io.js">
    </script> 
    <script src="./js//easytimer.min.js"></script>
+
+   <!-- Checa el endpoint para ver cuantos reventos de guia hay -->
+   <script type="text/javascript">
+        function callEndpoint() {
+            $.getJSON('/contador-eventos/3', function(data) {
+                //$('#reventon').append(data.rows[0].no_reventones);
+            });
+        }
+        callEndpoint();
+    </script>
    <script>
         
         // dev.kinnilweb.com
-        var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
+        //var socket = io.connect('http://ec2-18-219-18-35.us-east-2.compute.amazonaws.com:3000');
         // ezair.kinnilweb.com
         //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
         // localhost:3000
         //var socket = io.connect('localhost:3000');
+        // nuevo ambiente de pruebas
+        var socket = io.connect('http://ec2-18-222-91-253.us-east-2.compute.amazonaws.com:3000');
+
+        // VISTEON
+        //var socket = io.connect('http://159.65.96.228:3000');
+        
         
         socket.on('message', function(message) {
             console.log('el server esta vivo');
@@ -241,10 +245,19 @@
 
         socket.on('actualizar', function(message) {
 
-             console.log("socket.on - Actualizar - message.estado[0].status");
-             console.log(message.estado[0].razones_paro_id);
-             console.log(message.estado[0].razon);
-             console.log(message.turnoActual[0].nombre);
+            function callEndpoint() {
+                $.getJSON('/contador-digital/', function(data) {
+                    
+                    $('#digital1').html(data.rows[0].no_eventos);
+                    $('#digital2').html(data.rows[1].no_eventos);
+
+                });
+            }
+            callEndpoint();
+
+            
+
+             console.log("socket.on - Actualizar");
 
              // TODO: este codigo solo funciona para cuando hay una sola maquina, todabia hay que hacer que funcione para mas maquinas
              if (message.estado[0].status == 'online') {
@@ -264,7 +277,7 @@
                         $('#estado').removeClass('grey');
                     }
                 }
-                $("#estado").html(message.estado[0].razon);  
+                $("#estado").html(message.estado[0].razon);
             } else {
                 $('#estado').addClass('grey');
                 $('#estado').removeClass('red');
@@ -297,9 +310,9 @@
             // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
             if (message.calidad.length > 0) { 
                 $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
-                $("#pt").html(message.calidad[0].pt + " mts");
-                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " mts");
-                $("#total").html((message.calidad[0].total).toFixed(2) + " mts");
+                $("#pt").html(message.calidad[0].pt + " pzas");
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
+                $("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
             }
             else {
                 $("#calidad").html("0%");
@@ -323,11 +336,21 @@
             //console.log("llego un evento digital1: " +message);
             message = JSON.parse(message);
 
+            function callEndpoint() {
+                $.getJSON('/contador-digital/', function(data) {
+                    
+                    $('#digital1').html(data.rows[0].no_eventos);
+                    $('#digital2').html(data.rows[1].no_eventos);
+
+                });
+            }
+            callEndpoint();
+
+
             if (message.valor == 0){
                 //console.log('verde');
                 $('#digital1').addClass('green');
                 $('#digital1').removeClass('red');
-                $('#digital1').html("00:00");
 
                 timer.reset();
                 timer.stop();
@@ -335,11 +358,6 @@
                 //console.log('rojo');
                 $('#digital1').addClass('red');
                 $('#digital1').removeClass('green');
-
-                timer.start();
-                timer.addEventListener('secondsUpdated', function (e) {
-                    $('#digital1').html(timer.getTimeValues().toString(['minutes', 'seconds']));
-                });
              }
         })
 
@@ -349,11 +367,21 @@
 
             message = JSON.parse(message);
 
+            function callEndpoint() {
+                $.getJSON('/contador-digital/', function(data) {
+                    
+                    $('#digital1').html(data.rows[0].no_eventos);
+                    $('#digital2').html(data.rows[1].no_eventos);
+
+                });
+            }
+            callEndpoint();
+
+
             if (message.valor == 0){
                 //console.log('verde');
                 $('#digital2').addClass('green');
                 $('#digital2').removeClass('red');
-                $('#digital2').html("00:00");
 
                 
                 timer2.reset();
@@ -363,10 +391,6 @@
                 $('#digital2').addClass('red');
                 $('#digital2').removeClass('green');
 
-                timer2.start();
-                timer2.addEventListener('secondsUpdated', function (e) {
-                    $('#digital2').html(timer2.getTimeValues().toString(['minutes', 'seconds']));
-                });
              }
         })
 

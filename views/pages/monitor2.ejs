@@ -256,9 +256,9 @@
                             <h2>Piezas terminadas: 
                                 <span id="pt">
                                     <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                        <%= calidad[0].pt %> mts
+                                        <%= calidad[0].pt %> pzas
                                     <% } else{ %> 
-                                        0 mts
+                                        0 pzas
                                     <% } %>
                                 </span>
                             </h2>
@@ -269,9 +269,9 @@
                             <h2>Scrap: 
                                 <span id="scrap">
                                     <%if (calidad[0] && calidad[0].calidad !== null) { %>
-                                        <%= (calidad[0].scrap).toFixed(2) %> mts
+                                        <%= (calidad[0].scrap).toFixed(2) %> pzas
                                     <% } else{ %> 
-                                        0 mts
+                                        0 pzas
                                     <% } %>
                                 </span>
                             </h2>
@@ -305,7 +305,7 @@
     <script>
 
         // dev.kinnilweb.com
-        var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
+        var socket = io.connect('http://ec2-18-219-18-35.us-east-2.compute.amazonaws.com:3000');
         // ezair.kinnilweb.com
         //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
         // localhost:3000
@@ -378,9 +378,9 @@
             // Si calidad viene vacio hay que poner un 0 ( calidad: [] )
             if (message.calidad.length > 0) { 
                 $("#calidad").html((message.calidad[0].calidad).toFixed(2) + " %");
-                $("#pt").html(message.calidad[0].pt + " mts"); // Pieza terminada no esta con decimales porque nunca lleva
-                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " mts");
-                //$("#total").html((message.calidad[0].total).toFixed(2) + " mts");
+                $("#pt").html(message.calidad[0].pt + " pzas"); // Pieza terminada no esta con decimales porque nunca lleva
+                $("#scrap").html((message.calidad[0].scrap).toFixed(2) + " pzas");
+                //$("#total").html((message.calidad[0].total).toFixed(2) + " pzas");
             }
             else {
                 $("#calidad").html("0%");

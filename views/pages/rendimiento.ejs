@@ -4,6 +4,16 @@
 <head>
    <%include ../partials/head %>
    <title>Rendimiento</title>
+
+   <style>
+        @media print
+        {    
+            .no-print, .no-print *
+            {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -12,7 +22,7 @@
 <%include ../partials/logos %>
 <div class="menu">
     <div class="panel with-nav-tabs panel-primary">
-        <div class="panel-heading">
+        <div class="panel-heading no-print">
             <ul class="nav nav-tabs">
                 <li><a href="inicio">Inicio</a></li>
                 <li><a href="disponibilidad">Disponibilidad</a></li>
@@ -46,18 +56,18 @@
                             </div>
                             </div>
                     
-                            <div id="printThis">
+                            <div >
                                 <div class="row" >
                                     <div class="col-lg-6 col-sm-6 col-p-12">
-                                        <div class="chart" id="tatm"></div>
+                                        <div style="width: 600px; height: 400px; margin: 0 auto">
+                                            <div id="rendimiento" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                                        </div>
                                     </div>
-                                    <div class="col-lg-6 col-sm-6 col-p-12">
-                                        <div class="chart" id="desglose" ></div>
-                                    </div>
-                                </div>
-                                <div class="row" >
-                                    <div class="col-lg-3 col-sm-3">
-                                        <div id="rendimiento" class="gauge"></div>
+                                    <div class="col-lg-6 col-sm-6 col-p-12 text-center">
+                                        <div class="jumbotron">
+                                            <h1 id= "piezas-totales-titulo"></h1> 
+                                            <p id= "piezas-totales"></p> 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -77,6 +87,9 @@
    <script src="/socket.io/socket.io.js"></script> 
    <%include ../partials/js %>
    <%include ../partials/js-search %>
+   <script type="text/javascript" src='./js/highcharts.js'></script>
+   <script type="text/javascript" src='./js/highcharts-more.js'></script>
+   <script type="text/javascript" src='./js/solid-gauge.js'></script>
    <script>
         // Se hace la consulta segun los campos seleccionados
         // TODO: tomar en cuenta las reglas del negocio a programar
@@ -84,13 +97,20 @@
         // TODO: ya no encontre las demas hojas, hay que retomar con ricardo y ver si va a haber casos especificos donde se seleccione por maquina
         //
         // dev.kinnilweb.com
-        var socket = io.connect('http://ec2-18-221-199-24.us-east-2.compute.amazonaws.com:3000');
+        //var socket = io.connect('http://ec2-18-219-18-35.us-east-2.compute.amazonaws.com:3000');
         // ezair.kinnilweb.com
         //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
         // localhost:3000
         //var socket = io.connect('localhost:3000');
+        // nuevo ambiente de pruebas
+        var socket = io.connect('http://ec2-18-222-91-253.us-east-2.compute.amazonaws.com:3000');
 
-        function consultar() {
+        // VISTEON
+        //var socket = io.connect('http://159.65.96.228:3000');
+
+        function consultar(e) {
+            var e = window.event || e;
+	        var targ = e.target || e.srcElement;
 
             console.log("se hizo una consulta");
 
@@ -107,7 +127,7 @@
             // TODO: Agregar las validaciones
             // TODO: desplegar un mensage de que no se puede graficar si es que el reporte no regreso datos
 
-            event.preventDefault(); // Previene que ocurra el evento POST y se refresque la pagina asi como asi
+            e.preventDefault(); // Previene que ocurra el evento POST y se refresque la pagina asi como asi
 
             // No hace POST si no hay productos o turnos seleccionados
             if (tipo == 'turno' && json.turno == 'noturnos'){
@@ -121,48 +141,102 @@
             socket.emit('reporte-oee', json);
         }
 
+        function toPDF(e){
+            var e = window.event || e;
+	        var targ = e.target || e.srcElement;
+            e.preventDefault();
+            window.print();
+        }
+
         socket.on('reporte-oee', function(message) {
 
-            console.log("se recibio un evento de reporte-oee")
-            // TODO: agregar validaciones para cuando los valores sean nulos disponibilidad:[] rendimiento[] calidad[] se tiene que mostrar un mensaje al usuario o algo!
             window.scroll({ top: 500, left: 0, behavior: 'smooth' }); // Scroll sencillo smooth
-
-            // Load Charts and the corechart package.
-            google.charts.load('current', {'packages':['corechart']});
-            google.charts.load('current', {'packages':['gauge']});
-            google.charts.load('current', {'packages':['table']});
-
-            // Draw the charts when Charts is loaded.
-            google.charts.setOnLoadCallback(drawRendimientoChart); // Rendimiento Gauge
             
-            
-           
-            function drawRendimientoChart () {
-                var data = google.visualization.arrayToDataTable([
-                ['Label', 'Value'],
-                ['Rendimiento', message.rendimiento[0].rendimiento]
-                ]);
+            $("#piezas-totales-titulo").html("Mts");
+            $("#piezas-totales").html(message.rendimiento[0].piezas);
 
-                var formatter = new google.visualization.NumberFormat(
-                    {suffix: '%',pattern:'#'}
-                );
-                    formatter.format(data,1);
+            /*  
+            * Gauges
+            */
+            var gaugeOptions = {
 
-                var options = {
-                width: 400, height: 120,
-                redFrom: 1, redTo: 20,
-                yellowFrom:20, yellowTo: 40,
-                greenFrom: 80, greenTo: 100,
-                height: 250,
-                width: 250,
-                minorTicks: 5
-                };
+            chart: { type: 'solidgauge' },
+            title: null,
+            pane: {
+                center: ['50%', '85%'],
+                size: '140%',
+                startAngle: -90,
+                endAngle: 90,
+                background: {
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                    innerRadius: '60%',
+                    outerRadius: '100%',
+                    shape: 'arc'
+                }
+            },
+            tooltip: {
+                enabled: false
+            },
+            // the value axis
+            yAxis: {
+                stops: [
+                    [0.1, '#DF5353'], // green
+                    [0.5, '#DDDF0D'], // yellow
+                    [0.9, '#55BF3B'] // red
+                ],
+                lineWidth: 0,
+                minorTickInterval: null,
+                tickAmount: 2,
+                title: {
+                    y: -70
+                },
+                labels: {
+                    y: 16
+                }
+            },
 
-                var chart = new google.visualization.Gauge(document.getElementById('rendimiento'));
-                chart.draw(data, options);
+            plotOptions: {
+                solidgauge: {
+                    dataLabels: {
+                        y: 5,
+                        borderWidth: 0,
+                        useHTML: true
+                    }
+                }
             }
+            };
 
-          
+            // rendimiento
+            var chartRendimiento = Highcharts.chart('rendimiento', Highcharts.merge(gaugeOptions, {
+            yAxis: {
+                min: 0,
+                max: 100,
+                title: {
+                    text: 'Rendimiento'
+                }
+            },
+            title: {
+                text: 'Rendimiento'
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Rendimiento',
+                data: [message.rendimiento[0].rendimiento],
+                dataLabels: {
+                    format: '<div style="text-align:center"><span style="font-size:25px;color:' +
+                        ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>' +
+                        '<span style="font-size:12px;color:silver">%</span></div>'
+                },
+                tooltip: {
+                    valueSuffix: ' %'
+                }
+            }]
+
+            }));
+
+
         });
 
 
@@ -241,38 +315,6 @@
                 }
             }
         })
-
-        $(function() {
-
-            document.getElementById("Print").onclick = function () {
-                printElement(document.getElementById("printThis"));
-            };
-
-            function printElement(elem) {
-                var domClone = elem.cloneNode(true);
-
-                var $printSection = document.getElementById("printSection");
-
-                if (!$printSection) {
-                    var $printSection = document.createElement("div");
-                    $printSection.id = "printSection";
-                    document.body.appendChild($printSection);
-                }
-
-                $printSection.innerHTML = "";
-                $printSection.appendChild(domClone);
-                window.print();
-            }
-
-            /*$('.modal.printable').on('shown.bs.modal', function () {
-                $('.modal-dialog', this).addClass('focused');
-                $('body').addClass('modalprinter');
-
-            }).on('hidden.bs.modal', function () {
-                $('.modal-dialog', this).removeClass('focused');
-                $('body').removeClass('modalprinter');
-            });*/
-        });
 
     </script>
 </body>

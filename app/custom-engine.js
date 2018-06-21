@@ -7,6 +7,7 @@ var moment = require('moment-timezone');
 var mysql = require('mysql');
 var promiseMysql = require('promise-mysql');
 var dbconfig = require('../config/database');
+const utf8 = require('utf8');
 
 var promisePool = promiseMysql.createPool(dbconfig.connection);
 promisePool.query('USE ' + dbconfig.database);
@@ -52,7 +53,7 @@ module.exports = function(io) {
         // TODO: no mandarle el activo a jossie
         socket.on('config', function (message) {
 
-            log.info('Peticion de configuración')
+            console.log('Peticion de configuración')
 
             if (message == "all"){
                 
@@ -79,6 +80,12 @@ module.exports = function(io) {
                         return_data.maquinas = rows
                         
                         // TODO: validar si funciona.
+                        var result = connection.query("select * from razones_calidad where activo = true and id not in (1)")
+                        return result
+                    }).then(function(rows){
+                        return_data.razones_calidad = rows
+                        
+                        // TODO: validar si funciona.
                         var result = connection.query("select * from razones_paro where active = true and id not in (1,200,201)")
                         return result
                     }).then(function(rows) {
@@ -90,10 +97,14 @@ module.exports = function(io) {
                         promisePool.releaseConnection(connection);
                         
                         // Se separan los datos obtenidos de los queries
+
+                        console.log(return_data)
+
                         var plantas = return_data.plantas
                         var areas = return_data.areas
                         var maquinas = return_data.maquinas
                         var razones_paro =return_data.razones_paro
+                        var razones_calidad = return_data.razones_calidad
                         var turnos = return_data.turnos
         
                         // Objeto donde se va a guardar toda la confirguacion.
@@ -114,7 +125,7 @@ module.exports = function(io) {
         
                                         if (maquina.areas_id == area.id) // Si la maquina pertenece al area en turno
                                         {
-                                            json.plantas[x].areas[y].maquinas.push({"nombre": maquina.nombre, "id":maquina.id, razones: []}) // Se agrega la maquina al area en turno (4to nivel)
+                                            json.plantas[x].areas[y].maquinas.push({"nombre": maquina.nombre, "id":maquina.id, razones: [], calidad: [] }) // Se agrega la maquina al area en turno (4to nivel)
         
                                             for (var a = 0; a<razones_paro.length; a++){ // Se recorren todas las razones de paro
                                                 var razon_paro = razones_paro[a]
@@ -122,6 +133,15 @@ module.exports = function(io) {
                                                 if (razon_paro.maquinas_id == maquina.id){ // Si la razon de paro pertenece a la maquina en turno 
                                                     //json.plantas[x].areas[y].maquinas[z].razones.push(razon_paro.nombre) // Se agrega la razon de paro a la maquina en turno (5to nivel)
                                                     json.plantas[x].areas[y].maquinas[z].razones.push({"nombre": razon_paro.nombre, "id":razon_paro.id }) // Se agrega la razon de paro a la maquina en turno (5to nivel)
+                                                }
+                                            }
+
+                                            for (var a = 0; a<razones_calidad.length; a++){ // Se recorren todas las razones de calidad
+                                                var razon_calidad = razones_calidad[a]
+        
+                                                if (razon_calidad.maquinas_id == maquina.id){ // Si la razon de paro pertenece a la maquina en turno 
+                                                    //json.plantas[x].areas[y].maquinas[z].razones.push(razon_calidad.nombre) // Se agrega la razon de paro a la maquina en turno (5to nivel)
+                                                    json.plantas[x].areas[y].maquinas[z].calidad.push({"nombre": razon_calidad.nombre, "id":razon_calidad.id }) // Se agrega la razon de paro a la maquina en turno (5to nivel)
                                                 }
                                             }
                                         }
@@ -136,11 +156,11 @@ module.exports = function(io) {
                                 }
                             }
                         }
-                    
+
                         // Anterior emit ---- se guarda para pruebas solamente
                         //io.emit('config', '{"plantas": [{"planta": "Planta1-Chihuahua-Nave1", "areas": [{"nombre": "area 1", "maquinas": [{"nombre": "area1-maquina-1", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area1-maquina-2", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area1-maquina-3", "razones": ["razon 1", "razon 2", "razon 3"] } ] }, {"nombre": "area 2", "maquinas": [{"nombre": "area2-maquina-1", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area2-maquina-2", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area2-maquina-3", "razones": ["razon 1", "razon 2", "razon 3"] } ] } ], "turnos": [{"nombre": "primera", "inicio": "06:00", "fin": "15:00"}, {"nombre": "segunda", "inicio": "15:00", "fin": "21:00"}, {"nombre": "tercera", "inicio": "21:00", "fin": "06:00"} ] }, {"planta": "Planta1-Chihuahua-Nave2", "areas": [{"nombre": "area 1", "maquinas": [{"nombre": "area1-maquina-1", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area1-maquina-2", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area1-maquina-3", "razones": ["razon 1", "razon 2", "razon 3"] } ] }, {"nombre": "area 2", "maquinas": [{"nombre": "area2-maquina-1", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area2-maquina-2", "razones": ["razon 1", "razon 2", "razon 3"] }, {"nombre": "area2-maquina-3", "razones": ["razon 1", "razon 2", "razon 3"] } ] } ], "turnos": [{"nombre": "primera", "inicio": "06:00", "fin": "15:00"}, {"nombre": "segunda", "inicio": "15:00", "fin": "21:00"}, {"nombre": "tercera", "inicio": "21:00", "fin": "06:00"} ] } ] }'); // io.emit send a message to everione connected
                         log.info('Se envio la configuración')
-                        io.emit('config', JSON.stringify(json)); // se manda el contenigo a las tablets como un string
+                        io.emit('config', utf8.encode(JSON.stringify(json)));
                     }).catch(function(err) {
                        log.error('Error al obtener la configuración: ' + err)
                        //log.error(err)
@@ -350,7 +370,7 @@ module.exports = function(io) {
             
                             log.info('Se envio la actualización a todos los clientes conectados')
                             // Boradcast emite un mensaje a todos menos al que lo mando a llamar
-                            socket.broadcast.emit('actualizar', return_data);
+                            socket.broadcast.emit('actualizar', utf8.encode(JSON.stringify(return_data)));
         
                         }).catch(function(err) {
                            log.error(" Error al enviar la actualización" + err)
@@ -507,7 +527,8 @@ module.exports = function(io) {
     
                     log.info('Termina - socket on actualizar')
                     // Boradcast emite un mensaje a todos menos al que lo mando a llamar
-                    socket.emit('actualizar', return_data);
+                    socket.emit('accounts',  utf8.encode(JSON.stringify(returnData)));
+                    socket.emit('actualizar', utf8.encode(JSON.stringify(return_data)));
 
                 }).catch(function(err) {
                    log.error("Error - socket on actualizar " + err)
@@ -599,6 +620,12 @@ module.exports = function(io) {
 
             if (tipo == "producto")
                 where += "AND (e.productos_id = " + productos + ") "
+
+            // select * from eventos2 where concat(DATE_FORMAT(`fecha`, '%Y-%m-%d'),' ',`hora`) BETWEEN "2018-04-24 06:00" AND "2018-04-25 06:00"
+            if (tipo == "six-to-six") {
+                where = " where concat(DATE_FORMAT(e.fecha, '%Y-%m-%d'),' ',e.hora) BETWEEN '" + inicio + "06:00' AND '" + fin + "06:00'"
+                console.log(where)
+            }
             
                 
             var return_data = {}
@@ -647,6 +674,12 @@ module.exports = function(io) {
                     (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
                     from eventos2 e " + where + " \
                     group by maquinas_id") 
+
+                    console.log("select maquinas_id, sum(case when activo=1 then tiempo else 0 end) ta, \
+                    sum(case when activo=0 then tiempo else 0 end) tm, \
+                    (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
+                    from eventos2 e " + where + " \
+                    group by maquinas_id")
                     
                     return result
                 }).then(function(rows){ 
@@ -754,6 +787,20 @@ module.exports = function(io) {
 
                 }).then(function(rows){
 
+                    var result = connection.query("select d1.digital as digital, d1.activo as activo, d3.no_eventos \
+                    from digital as d1 \
+                    inner join (select max(id) as id, digital \
+                      from digital \
+                      group by digital) as d2 \
+                    on d1.id = d2.id \
+                    inner join (select count(*) no_eventos, digital from digital where activo = 0 group by digital) as d3 \
+                    on d1.digital = d3.digital \
+                    order by d1.digital")
+                    
+                    return result
+                }).then(function(rows) {
+                    message.rows = rows
+
                     promisePool.releaseConnection(connection);
 
                     socket.broadcast.emit('digital1', message);
@@ -806,6 +853,20 @@ module.exports = function(io) {
 
                 }).then(function(rows){
 
+                    var result = connection.query("select d1.digital as digital, d1.activo as activo, d3.no_eventos \
+                    from digital as d1 \
+                    inner join (select max(id) as id, digital \
+                      from digital \
+                      group by digital) as d2 \
+                    on d1.id = d2.id \
+                    inner join (select count(*) no_eventos, digital from digital where activo = 0 group by digital) as d3 \
+                    on d1.digital = d3.digital \
+                    order by d1.digital")
+                    
+                    return result
+                }).then(function(rows) {
+                    message.rows = rows
+
                     promisePool.releaseConnection(connection);
 
                     socket.broadcast.emit('digital2', message);
@@ -846,9 +907,9 @@ module.exports = function(io) {
 			hora = moment(today + " " + horaActual, 'YYYY-MM-DD HH:mm:ss').tz('America/Chihuahua').format('HH:mm:ss')
             
             // Esta condicion hace que si son piezas malas las combierta de kgs a metros, 
-            if (evento.razon_calidad > 1) {
-                evento.valor = evento.valor * 160.46213093709884467265725288832 // 6.232 = 1 km de cable
-            }
+            //if (evento.razon_calidad > 1) {
+            //    evento.valor = evento.valor * 160.46213093709884467265725288832 // 6.232 = 1 km de cable
+            //}
 
             promisePool.getConnection().then(function(connection) {
                 
@@ -870,8 +931,9 @@ module.exports = function(io) {
 
                     var result = connection.query("INSERT INTO eventos2 SET ?", save)
 
+                    // Calculo no necesario, esto solo aplica para LEONI
                     // Esta condicion hace que si son piezas malas las combierta a metros, 
-                    if (evento.razon_calidad > 1) {
+                    /*if (evento.razon_calidad > 1) {
 
                         evento.valor = pos_to_neg(evento.valor)
 
@@ -890,7 +952,7 @@ module.exports = function(io) {
                         };
     
                         var result = connection.query("INSERT INTO eventos2 SET ?", save)
-                    }
+                    }*/
 
                     return result
 
@@ -1056,12 +1118,12 @@ module.exports = function(io) {
             var calidad = json.calidad // id
             var valor = json.valor // id
 
-            valor = valor * 160.46213093709884467265725288832 // 6.232 = 1 km de cable
+            //valor = valor * 160.46213093709884467265725288832 // 6.232 = 1 km de cable
 
-            // 6.232 kgs = 1000 mts
-            // 1kgs      = 160.46213093709884467265725288832 mts
+            // 6.232 kgs = 1000 pzas
+            // 1kgs      = 160.46213093709884467265725288832 pzas
 
-            console.log(planta + " " + area + " " + maquina + " " + valor);
+            //console.log(planta + " " + area + " " + maquina + " " + valor);
 
             // Se obtiene fecha y hora
             var today = new Date();
@@ -1123,6 +1185,51 @@ module.exports = function(io) {
             });
         });
 
+        /*
+        * Pruebas para Cedar Logistics
+        */
+
+        // Mandar accounts
+        socket.on('accounts', function (json) {
+            var accounts = '{"users": [{"id": 1, "name": "Daniel", "password": "4rv1z0", "type": 1 }, {"id": 2, "name": "Roger", "password": "r0g3r", "type": 1 }, {"id": 3, "name": "Ricardo", "password": "R1c4rd0", "type": 2 }, {"id": 4, "name": "Miguel", "password": "sdasfg", "type": 2 }, {"id": 5, "name": "Nuvia", "password": "Nuvi4", "type": 3 }, {"id": 6, "name": "Carlos", "password": "Ch4rl1", "type": 3 }] }'
+        
+          socket.emit('accounts',accounts);
+        });
+
+        //Mandar assets
+        socket.on('assets', function (json) {
+            var assets = '{"trucks": [{"id": 1, "name": "truck 1", "mi": 13500 }, {"id": 2, "name": "truck 2", "mi": 5200 },{"id": 3, "name": "truck 3", "mi": 24500 }, {"id": 4, "name": "truck 4", "mi": 34050 }], "trailers": [{"id": 1, "name": "trailer 1"}, {"id": 2, "name": "trailer 2"},{"id": 3, "name": "trailer 3"}, {"id": 4, "name": "trailer 4"}] }' 
+        
+          socket.emit('assets',assets);
+        });
+
+        // Se seleccionaron los assets
+        socket.on('selected-asset', function (json) {   
+          socket.emit('selected-asset','{"received": true}');
+        });
+
+        // activo
+        socket.on('active', function (json) {
+          socket.emit('active','{"received": true}');
+        });
+
+        // inactivoi
+        socket.on('inactive', function (json) {
+          socket.emit('inactive','{"received": true}');
+        });
+
+        // se mando el contenido del tms
+        socket.on('tms', function (json) {
+            var tms ='{"id":1, "ticket":1, "tms":"75738501", "client":"HALLIBURTON", "substatus":0, "facility":"RANGELAND", "pick-date":"2018/04/25 22:00:00", "location":"vanesa", "location-lat":"28.8377425761346", "location-long":"-105.91232550797594", "drop-date":"2018/04/26 22:00:00", "product":"50-59", "weight":"", "miles":85, "load-rate":502.75, "currency":"USD", "sand-type":"100 Mesh", "po":"", "bol":"", "base":"", "silo":"", "notes":"Sin notas"}'
+        
+          socket.emit('tms',tms);
+        });
+
+        // se recibio un status
+        socket.on('status', function (json) {
+          socket.emit('status', json);
+        });
+        
         // Aqui puedo ir agregando mas sockets
     });
 };

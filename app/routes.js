@@ -664,6 +664,46 @@ module.exports = function(app, passport) {
 		})
 	});
 
+	/*
+	* Contar el numero de eventos por Id
+	*/
+	app.get('/contador-eventos/:razonParoId', function(req, res) {
+
+		Eventos.contarEventos(req.params.razonParoId, function(err, rows) {
+			if (rows) {
+				res.status(200);
+				res.contentType('application/json');
+				res.send(JSON.stringify({ message: '', 
+											rows: rows
+										}));
+
+			} else {
+				res.status(404);
+				res.contentType('application/json');
+				res.send(JSON.stringify({ message: err }));
+			}
+		})
+	});
+
+	/*
+	* Contador para digital 1 & 2
+	*/
+	app.get('/contador-digital/', function(req, res) {
+
+		Eventos.contadorDigital(function(err, rows) {
+			if (rows) {
+				res.status(200);
+				res.contentType('application/json');
+				res.send(JSON.stringify({ message: '', rows: rows }));
+
+			} else {
+				res.status(404);
+				res.contentType('application/json');
+				res.send(JSON.stringify({ message: err }));
+			}
+		})
+	});
+
 	// =====================================
 	// LOGOUT ==============================
 	// =====================================
@@ -677,9 +717,14 @@ module.exports = function(app, passport) {
 	* Monitor 2
 	*/
 	app.get('/monitor2', function(req, res) {
-		
 		res.render("pages/monitor2.ejs");
+	});
 
+	/*
+	* Print test
+	*/
+	app.get('/print', function(req, res) {
+		res.render("pages/print.ejs");
 	});
 
 };

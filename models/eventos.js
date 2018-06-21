@@ -180,12 +180,14 @@ exports.getDashboard = function(done) {
         }).then(function(rows){ 
             return_data.calidad = rows
 
-            var result = connection.query("select d1.digital as digital, d1.activo as activo \
+            var result = connection.query("select d1.digital as digital, d1.activo as activo, d3.no_eventos \
             from digital as d1 \
             inner join (select max(id) as id, digital \
               from digital \
               group by digital) as d2 \
             on d1.id = d2.id \
+            inner join (select count(*) no_eventos, digital from digital where activo = 0 group by digital) as d3 \
+            on d1.digital = d3.digital \
             order by d1.digital")
             
             return result
@@ -902,6 +904,53 @@ exports.postConfiguracion = function(tipo, done) {
         }
 }
 
+
+
 exports.otro = function(valor, done) {
     // cuando termine llama return done(null, return_data); o return done(err)
+}
+
+/*
+* Perculiaridades de cada usuario
+*/
+
+exports.contarEventos = function(razonParoId, done) {
+
+    promisePool.getConnection().then(function(connection) {
+        connection.query('select maquinas_id, count(*) no_reventones from eventos2 where razones_paro_id = ' + razonParoId + ' group by maquinas_id; ')
+        .then(function(rows){
+            return done(null, rows);
+            promisePool.releaseConnection(connection);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err)
+
+        });
+    });
+}
+
+exports.contadorDigital = function(done) {
+
+    promisePool.getConnection().then(function(connection) {
+        connection.query('select d1.digital as digital, d1.activo as activo, d3.no_eventos \
+                            from digital as d1 \
+                            inner join (select max(id) as id, digital \
+                            from digital \
+                            group by digital) as d2 \
+                            on d1.id = d2.id \
+                            inner join (select count(*) no_eventos, digital from digital where activo = 0 group by digital) as d3 \
+                            on d1.digital = d3.digital \
+                            order by d1.digital')
+        .then(function(rows){
+            
+            promisePool.releaseConnection(connection);
+            return done(null, rows);
+
+        }).catch(function(err) {
+            console.log(err); 
+            return done(err);
+
+        });
+    });
 }

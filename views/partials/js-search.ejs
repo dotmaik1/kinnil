@@ -25,6 +25,13 @@ function byHora() {
     tipo = "hora";
 }
 
+function bySixToSix() {
+    document.getElementById('ifTurno').style.display = 'none';
+    document.getElementById('ifProducto').style.display = 'none';
+    document.getElementById('ifHora').style.display = 'none';
+    tipo = "six-to-six"
+}
+
 $(document).ready(function() { // El selector de fechas se despliega hasta que toda la pagina cargo
 
 $(function() {
