@@ -177,9 +177,11 @@ module.exports = function(io) {
 
         // TODO: Hay que hacer otro evento donde se guarde la calidad (hay que hablar esto con Jossie para ver si es posible o si utilizamos es mismo)
         socket.on('evento', function (message) {
-
-            log.info('Evento Recibido' + message)
+            log.info('inicia socket.on evento');
+            
             var evento = JSON.parse(message);
+            log.info('Evento Recibido');
+            log.info(evento);
 
             // Se obtiene fecha y hora
             var today = new Date();
@@ -224,7 +226,7 @@ module.exports = function(io) {
                         razones_calidad_id: 1 // Se guarda 1 (Pieza buena) porque aqui vamos a medir TA/TM solamente pero el campo es not null TODO: Mejorar esto
                     };
 
-                    console.log(save);
+                    log.info(save);
 
                     var result = connection.query("INSERT INTO eventos2 SET ?", save)
                     
@@ -527,7 +529,7 @@ module.exports = function(io) {
     
                     log.info('Termina - socket on actualizar')
                     // Boradcast emite un mensaje a todos menos al que lo mando a llamar
-                    socket.emit('accounts',  utf8.encode(JSON.stringify(returnData)));
+                    socket.emit('accounts',  utf8.encode(JSON.stringify(return_data)));
                     socket.emit('actualizar', utf8.encode(JSON.stringify(return_data)));
 
                 }).catch(function(err) {
@@ -582,6 +584,8 @@ module.exports = function(io) {
         });
 
         socket.on('reporte-oee', function (json) {
+            log.info("llego un socket en reporte-oee");
+
             var planta = json.planta // all | id
             var area = json.area // all | id
             var turno = json.turno // id
@@ -593,7 +597,8 @@ module.exports = function(io) {
             var tipo = json.tipo // hora | producto | turno.
 
             var where = " WHERE (e.fecha >= '" + inicio + "' AND e.fecha <= '" + fin + "') "
-
+            var wherehoras = "";//intento resolver un bug con esta variable
+            
             // Si las planta no es "todas" se filtra tambien por planta ID
             if (planta != "all")
                 where += "AND (e.plantas_id = " + planta + " ) "
@@ -624,7 +629,7 @@ module.exports = function(io) {
             // select * from eventos2 where concat(DATE_FORMAT(`fecha`, '%Y-%m-%d'),' ',`hora`) BETWEEN "2018-04-24 06:00" AND "2018-04-25 06:00"
             if (tipo == "six-to-six") {
                 where = " where concat(DATE_FORMAT(e.fecha, '%Y-%m-%d'),' ',e.hora) BETWEEN '" + inicio + "06:00' AND '" + fin + "06:00'"
-                console.log(where)
+                //console.log(where)
             }
             
                 
@@ -662,8 +667,11 @@ module.exports = function(io) {
                         where += "AND CASE WHEN CAST('" + rows[0].inicio + "' as time) <= CAST('" +rows[0].fin + "' as time) \
                         THEN e.hora >= CAST('" + rows[0].inicio + "' as time) AND e.hora < CAST('" +rows[0].fin + "' as time) \
                         ELSE (e.hora <= CAST('" + rows[0].inicio + "' as time) AND e.hora <= CAST('" +rows[0].fin + "' as time)) OR \
-                             (e.hora >= CAST('" + rows[0].inicio + "' as time) AND e.hora >= CAST('" +rows[0].fin + "' as time)) END "
-                        
+                             (e.hora >= CAST('" + rows[0].inicio + "' as time) AND e.hora >= CAST('" +rows[0].fin + "' as time)) END ";
+                        wherehoras = " WHERE CASE WHEN CAST('" + rows[0].inicio + "' as time) <= CAST('" +rows[0].fin + "' as time) \
+                        THEN e.hora >= CAST('" + rows[0].inicio + "' as time) AND e.hora < CAST('" +rows[0].fin + "' as time) \
+                        ELSE (e.hora <= CAST('" + rows[0].inicio + "' as time) AND e.hora <= CAST('" +rows[0].fin + "' as time)) OR \
+                             (e.hora >= CAST('" + rows[0].inicio + "' as time) AND e.hora >= CAST('" +rows[0].fin + "' as time)) END ";
                     }
                     
                     // TODO: A todos estos queries hay que agregar la opcion para que vean el turno de 3ra para que no fallen
@@ -674,17 +682,19 @@ module.exports = function(io) {
                     (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
                     from eventos2 e " + where + " \
                     group by maquinas_id") 
-
-                    console.log("select maquinas_id, sum(case when activo=1 then tiempo else 0 end) ta, \
-                    sum(case when activo=0 then tiempo else 0 end) tm, \
-                    (sum(case when activo=1 then tiempo else 0 end) * 100) / (sum(case when activo=1 then tiempo else 0 end) + sum(case when activo=0 then tiempo else 0 end)) disponibilidad  \
-                    from eventos2 e " + where + " \
-                    group by maquinas_id")
                     
                     return result
                 }).then(function(rows){ 
                     return_data.disponibilidad = rows
-        
+        // Obtiene el desglose
+                        var result = connection.query("(SELECT e.fecha, e.hora, r.nombre FROM \
+                        eventos2 e JOIN razones_paro r ON e.razones_paro_id = r.id" + where + " LIMIT 1) \
+                        UNION (SELECT  e.fecha, e.hora, r.nombre FROM \
+                        eventos2 e JOIN razones_paro r ON e.razones_paro_id = r.id" + where + " ORDER BY e.id DESC LIMIT 1)")
+
+                    return result
+                }).then(function(rows){
+                    return_data.primer_ultimo_evento = rows
                     // Obtiene el desglose
                     var result = connection.query("SELECT sum(e.tiempo) 'tm', r.nombre 'nombre' FROM \
                         eventos2 e JOIN razones_paro r ON e.razones_paro_id = r.id" + where + "  and e.activo = false GROUP BY r.nombre ORDER BY tm desc")
@@ -712,7 +722,46 @@ module.exports = function(io) {
                     return result
                 }).then(function(rows){ 
                     return_data.rendimiento = rows
-        
+                    
+                    var result = [{}];
+                    if(inicio==fin){
+                        //Set up de variables
+                        var query_temp = "SELECT @razon:=razones_paro_id,@act:=activo,@hora:=hora,@fechainicio:=fecha from eventos2 e "+ where +" limit 1";
+                    
+                        result = connection.query(query_temp);
+                        
+                        //Obtenemos los eventos agrupados por cada vez que se cambie la razon de paro
+                        query_temp = "(SELECT @act,@act:=activo,@fechainicio as fechaInicio,@fechainicio:=fecha as fechaFin,@hora as inicio,@hora:=hora as fin,@razon:=razones_paro_id,r.nombre \
+                            FROM (SELECT e.* FROM eventos2 e " + where +" ORDER BY e.id ASC) AS e2 JOIN razones_paro r ON @razon= r.id WHERE  @razon != razones_paro_id) \
+                            UNION (SELECT e.activo,@act:=activo,@fechainicio as fechaInicio,@fechainicio:=fecha as fechaFin,@hora as inicio,hora as fin,razones_paro_id,r.nombre FROM  eventos2 e JOIN razones_paro r ON e.razones_paro_id= r.id "+ where+" ORDER BY e.id DESC LIMIT 1)";
+                            
+                        result = connection.query(query_temp) 
+                    }else{
+                        var date1 = new Date(inicio);
+                        var date2 = new Date(fin);
+                        //Cuando la fecha de inicio es diferente a la final es necesario hacer query dia por dia para evitar un bug.
+                        while(date1<=date2){
+                            var fecha_uso = date1.getFullYear()+'-'+ (date1.getMonth()+1)+'-'+date1.getDate();
+                            //Set up de variables
+                            var query_temp = "SELECT @razon:=razones_paro_id,@act:=activo,@hora:=hora,@fechainicio:=fecha from eventos2 e "+ wherehoras +" AND e.fecha = CAST('"+fecha_uso+"' as date) limit 1";
+                    
+                            var result_temp = connection.query(query_temp);
+                            
+                            //Obtenemos los eventos agrupados por cada vez que se cambie la razon de paro
+                            query_temp = "(SELECT @act,@act:=activo,@fechainicio as fechaInicio,@fechainicio:=fecha as fechaFin,@hora as inicio,@hora:=hora as fin,@razon:=razones_paro_id,r.nombre \
+                            FROM (SELECT e.* FROM eventos2 e " + wherehoras +" AND e.fecha = CAST('"+fecha_uso+"' as date) ORDER BY e.id ASC) AS e2 JOIN razones_paro r ON @razon= r.id WHERE  @razon != razones_paro_id) \
+                            UNION (SELECT e.activo,@act:=activo,@fechainicio as fechaInicio,@fechainicio:=fecha as fechaFin,@hora as inicio,hora as fin,razones_paro_id,r.nombre FROM  eventos2 e JOIN razones_paro r ON e.razones_paro_id= r.id "+ wherehoras +" AND e.fecha = CAST('"+fecha_uso+"' as date) ORDER BY e.id DESC LIMIT 1)";
+                            
+                            result_temp = connection.query(query_temp);
+                            result.push(result_temp);
+                            date1.setDate(date1.getDate() + 1);
+                        }
+                    }
+                    
+                    return result
+                }).then(function(rows){ 
+                    return_data.desglosehoras = rows;
+
                     var result = connection.query("select maquina, sum(pt) pt, sum(scrap) scrap, sum(total) total, sum(calidad_real)/count(*) calidad_real, sum(calidad)/count(*) calidad from \
                     (select e.maquinas_id maquina, \
                     sum(case when e.razones_calidad_id = 1 then e.valor else 0 end) pt, \
@@ -913,7 +962,7 @@ module.exports = function(io) {
 
             promisePool.getConnection().then(function(connection) {
                 
-                connection.query("select 1 from dual").then(function(rows){
+                connection.query("SELECT productos_id FROM maquinas WHERE id="+evento.maquina_id).then(function(rows){
 
                     // Salva el incremento de piezas buenas o malas normalmente
                     var save  = {
@@ -924,12 +973,14 @@ module.exports = function(io) {
                         plantas_id: evento.planta_id,
                         areas_id: evento.area_id,
                         maquinas_id: evento.maquina_id,
-                        productos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajadoproductos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajado
+                        productos_id: rows[0].productos_id, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajadoproductos_id: 1, // TODO: Aqui hay que hacer un query con el Id de la maquina para saber cual es el producto que se esta trabajado
                         razones_paro_id: 1,
                         razones_calidad_id: evento.razon_calidad // Se guarda 1 (Pieza buena) porque aqui vamos a medir TA/TM solamente pero el campo es not null TODO: Mejorar esto
                     };
 
-                    var result = connection.query("INSERT INTO eventos2 SET ?", save)
+                    var result = connection.query("INSERT INTO eventos2 SET ?", save);
+                    log.info("Se mando el insert a la db");
+                    log.info(save);
 
                     // Calculo no necesario, esto solo aplica para LEONI
                     // Esta condicion hace que si son piezas malas las combierta a metros, 
@@ -957,7 +1008,8 @@ module.exports = function(io) {
                     return result
 
                 }).then(function(rows){
-
+                    log.info("promesa completada incremento 1");
+                    log.info(rows);
                     // Suelta la conexion ejemplo: Connection 404 released
                     //connection.release();
                     // Parece que funciona igual al de arriba. Hay que probarlo en desarrollo

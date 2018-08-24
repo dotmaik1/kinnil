@@ -73,15 +73,59 @@
                                     </div>
                                 </div>
                                 <div class="row" >
+                                    <div class="col-lg-12 col-sm-12">
+                                        <div id = "tabla-desglose-eventos"></div>
+                                    </div>
+                                </div>
+                                <div class="row" >
                                     <br/>
                                     <div class="col-lg-6 col-sm-6 col-p-12">
                                         <div style="width: 600px; height: 400px; margin: 0 auto">
                                             <div id="disponibilidad" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
                                         </div>
                                     </div>
+                                    <div class="col-lg-6 col-sm-6 col-p-12">
+                                        <div class="jumbotron text-center">
+                                            <h1 id= "horas-titulo"></h1> 
+                                            <p id= "horas"></p> 
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" >
+                                    <br/>
+                                    <div class="col-lg-6 col-sm-6 col-p-12">
+                                    </div>
+                                    <div class="col-lg-6 col-sm-6 col-p-12">
+                                        <div class="jumbotron text-center">
+                                            <button style="display:none"; class="btn btn-primary pull-right no-print" onclick="JSONToCSVConvertor('Disponibilidad', true)" id="reporte-excel">Descargar historial en excel</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
+                            <table id="tabla-excel" style="display:none;">
+                                <tr>
+                                    <td colspan="5">Disponibilidad</td>
+                                    <td><img src='./img/kinnil.png' alt=''/></td>
+                                </tr>
+                                <tr>
+                                    <td>Usuario:</td>
+                                    <td><%= user.username %></td>
+                                </tr>
+                                <tr>
+                                    <td>Planta:</td>
+                                    <td id="tabla-planta"></td>
+                                    <td></td>
+                                    <td>Area:</td>
+                                    <td id="tabla-area"></td>
+                                </tr>
+                                <tr>
+                                    <td>Fecha inicio:</td>
+                                    <td id="tabla-fecha-inicio"></td>
+                                    <td></td>
+                                    <td>Fecha fin:</td>
+                                    <td id="tabla-fecha-fin"></td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -110,7 +154,7 @@
             // TODO: ya no encontre las demas hojas, hay que retomar con ricardo y ver si va a haber casos especificos donde se seleccione por maquina
             //
             // leoni.kinnilweb.com
-             var socket = io.connect('http://ec2-18-219-18-35.us-east-2.compute.amazonaws.com:3000');
+             //var socket = io.connect('http://ec2-18-219-18-35.us-east-2.compute.amazonaws.com:3000');
             // ezair.kinnilweb.com
             //var socket = io.connect('http://ec2-13-58-128-66.us-east-2.compute.amazonaws.com:3000');
             // localhost:3000
@@ -120,15 +164,16 @@
 
             // VISTEON
             //var socket = io.connect('http://159.65.96.228:3000');
-    
+		var socket = io.connect('kaman.kinnilweb.com:3000');
+        var json = {};
             
             function consultar(e) {
                 var e = window.event || e;
 	            var targ = e.target || e.srcElement;
     
-                console.log("se hizo una consulta");
+                //console.log("se hizo una consulta");
     
-                var json = {}
+                json = {};
                 json.planta = $("#plantas-choice").val();
                 json.area = $("#areas-choice").val();
                 json.turno = $("#turno").val();
@@ -155,6 +200,135 @@
                 socket.emit('reporte-oee', json);
             }
 
+
+              /*          $(document).ready(function(){
+                $('button').click(function(){
+                    var data = $('#txt').val();
+                    if(data == '')
+                        return;
+                    
+                    JSONToCSVConvertor(data, "Vehicle Report", true);
+                });
+            });*/
+            var JSONData = [];
+            function JSONToCSVConvertor(ReportTitle, ShowLabel) {
+                var CSV = '';    
+                //Set Report title in first row or line
+                CSV += ReportTitle + '\r\n\n';
+                var row = "";
+                row += 'Usuario:,<%= user.username %>\r\n';
+                row += 'Planta:,'+json.planta+',,Area:,'+json.area+'\r\n';
+                row += 'Fecha inicio:,'+json.inicio+',,Fecha Fin:,'+json.fin+'\r\n';
+                CSV += row + '\r\n';
+                
+                for(var j = 0; j<JSONData.length;j++){
+                    //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+                    var arrData = typeof JSONData[j] != 'object' ? JSON.parse(JSONData[j]) : JSONData[j];
+                    //console.log(arrData);
+                    //console.log(arrData.length);
+                    //var arrData = JSONData[j];
+                    //This condition will generate the Label/Header
+                    if (j<1) {
+                        row = "";
+                        jQuery.each(arrData, function(key, val) {
+
+                             if(key=='fechaInicio' || key=='fechaFin' || key=='inicio' || key=='fin' || key=='nombre'){
+                                row += key + ',';
+                            }
+                            //$("#" + i).append(document.createTextNode(" - " + val));
+                        });
+                        //This loop will extract the label from 1st index of on array
+                        /*for (var key in arrData[0]) {
+                            
+                            //Now convert each value to string and comma-seprated
+                            if(key=='fechaInicio' || key=='fechaFin' || key=='inicio' || key=='fin' || key=='nombre'){
+                                row += key + ',';
+                            }
+                        }*/
+
+                        row = row.slice(0, -1);
+                        
+                        //append Label row with line break
+                        CSV += row + '\r\n';
+                    }
+                    row = "";
+                    jQuery.each(arrData, function(key, val) {
+                        
+                        if(key=='fechaInicio' || key=='fechaFin' || key=='inicio' || key=='fin' || key=='nombre'){
+                            if(key=='fechaInicio' || key=='fechaFin'){
+                                row += '"' + val.substring(0,10) + '",';
+                            }else{
+                                row += '"' + val + '",';
+                            }
+                        }
+
+                        if(key=='nombre'){
+                            row.slice(0, row.length - 1);
+                        
+                            //add a line break after each row
+                            CSV += row + '\r\n';
+                            row = "";
+                        }
+                        
+
+                    //$("#" + i).append(document.createTextNode(" - " + val));
+                    });
+                    
+                    //1st loop is to extract each row
+                    /*for (var i = 0; i < arrData.length; i++) {
+                        row = "";
+                        
+                        //2nd loop will extract each column and convert it in string comma-seprated
+                        for (var index in arrData[i]) {
+                            if(index=='fechaInicio' || index=='fechaFin' || index=='inicio' || index=='fin' || index=='nombre'){
+                                if(index=='fechaInicio' || index=='fechaFin'){
+                                    row += '"' + arrData[i][index].substring(0,10) + '",';
+                                }else{
+                                    row += '"' + arrData[i][index] + '",';
+                                }
+                            }
+                        }
+
+                        row.slice(0, row.length - 1);
+                        
+                        //add a line break after each row
+                        CSV += row + '\r\n';
+                    }*/
+
+                }
+                
+                if (CSV == '') {        
+                    alert("Invalid data");
+                    return;
+                }   
+                var date = new Date();
+                //Generate a file name
+                var fileName = "Disponibilidad_"+ date.getDate();
+                //this will remove the blank-spaces from the title and replace it with an underscore
+                //fileName += ReportTitle.replace(/ /g,"_");   
+                
+                //Initialize file format you want csv or xls
+                var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+                
+                // Now the little tricky part.
+                // you can use either>> window.open(uri);
+                // but this will not work in some browsers
+                // or you will not get the correct file extension    
+                
+                //this trick will generate a temp <a /> tag
+                var link = document.createElement("a");    
+                link.href = uri;
+                
+                //set the visibility hidden so it will not effect on your web-layout
+                link.style = "visibility:hidden";
+                link.download = fileName + ".csv";
+                
+                //this part will append the anchor tag and remove it after automatic click
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
             function toPDF(e){
                 var e = window.event || e;
 	            var targ = e.target || e.srcElement;
@@ -164,16 +338,37 @@
     
             socket.on('reporte-oee', function(message) {
     
-                console.log("se recibio un evento de reporte-oee" + JSON.stringify(message))
+                console.log("se recibio un evento de reporte-oee" );
+                console.log(message);
                 // TODO: agregar validaciones para cuando los valores sean nulos disponibilidad:[] rendimiento[] calidad[] se tiene que mostrar un mensaje al usuario o algo!
                 window.scroll({ top: 500, left: 0, behavior: 'smooth' }); // Scroll sencillo smooth
-    
+                //JSONData = message.desglosehoras;
+                
+                for(var i = 0;i<message.desglosehoras.length;i++){
+                    JSONData.push(message.desglosehoras[i]);
+                }
+                //console.log(JSONData);
 
+                $("#reporte-excel").show();
                 /*
                 * TA/TM
                 */
+                var inicio = new Date(json.inicio.substring(0,4),json.inicio.substring(5,7)-1,json.inicio.substring(8),message.turnoActual[0].inicio.substring(0,2),message.turnoActual[0].inicio.substring(3,5),message.turnoActual[0].inicio.substring(6));
+                var fin = new Date(json.fin.substring(0,4),json.fin.substring(5,7)-1,json.fin.substring(8),message.turnoActual[0].fin.substring(0,2),message.turnoActual[0].fin.substring(3,5),message.turnoActual[0].fin.substring(6));
+                var ahora = new Date();
+                
                 var ta = message.disponibilidad[0].ta/60/60;
                 var tm = message.disponibilidad[0].tm/60/60;
+                
+                if(ahora>fin){
+                    var diff = (fin - inicio);
+                    diff /= (1000);
+                    var hours = Math.abs(fin - inicio) / 36e5;
+                    $("#horas-titulo").html("Horas trabajadas: " + ta.toFixed(2) + " de " + (hours).toFixed(2));
+                }else{
+                    $("#horas-titulo").html("Horas trabajadas: " + ta.toFixed(2) + " de " + (ta+tm).toFixed(2));
+                }
+                
 
                 Highcharts.chart('tatm', {
                     chart: {
@@ -351,6 +546,22 @@
                 }
 
                 $('#tabla-desglose').append(table);
+                $('#tabla-desglose-eventos').html('');
+
+                table = $('<table>').addClass('table table-bordered table-condensed table-hover table-striped');
+                var dato = ["Primer activacion", "Ultima activacion"];
+                for(i=0; i<message.primer_ultimo_evento.length; i++){
+                    var row = $('<tr>').addClass('bar');
+                    var td = $('<td>').text(dato[i]);
+                    row.append(td);
+                    var td2 = $('<td>').text((message.primer_ultimo_evento[i].fecha.substring(0,10)));
+                    row.append(td2);
+                    td2 = $('<td>').text((message.primer_ultimo_evento[i].hora));
+                    row.append(td2);
+                    table.append(row);
+                }
+
+                $('#tabla-desglose-eventos').append(table);
 
             });
     
