@@ -38,12 +38,13 @@ module.exports = function(cron) {
     });
 
 };
-
-/*
-* El intervalo sera tratado en minutos
-*/
+//****************************************************FUNCIONES***************************************************************
 function getEvents(interval, nivel) {
-
+    /*********************************************************************************************************************
+    * Esta funcion es para checar los eventos de las maquinas, si lleva un determinado tiempo apagada enviara una alerta *
+    * @param: interval es el numero de minutos que es necesario que la maquina este apagada para que se envie la alerta  *
+    * @param: nivel es el nivel de la alerta con el que se decide a que usuario se le mandara la alerta                  *
+    **********************************************************************************************************************/
     var return_data = {}
 
     promisePool.getConnection().then(function(connection) {
@@ -134,7 +135,13 @@ function getEvents(interval, nivel) {
 * Se recibe email, eventos e intervalos para mandar el correo
 */
 function sendEmail(events, emails, interval, nivel) {
-
+    /******************************************************************************************************************************************
+    * Esta funcion es para mandar por email las alerta encontradas                                                                            *
+    * @param: events es el objeto que trae que maquina(nombre) ha estado parada por cuanto tiempo(diferencia_de_tiempo) y porque razon(razon) *
+    * @param: emails son los correos a los que enviara la alerta                                                                              *
+    * @param: interval es el numero de minutos que la maquina ha estado apagada                                                               *
+    * @param: nivel es el nivel de la alerta                                                                                                  *
+    *******************************************************************************************************************************************/
     var email_list = []
     for (x=0; x < emails.length; x++) {
         console.log(emails)
@@ -172,3 +179,4 @@ function sendEmail(events, emails, interval, nivel) {
     }
         
 }
+//************************************************FIN FUNCIONES***************************************************************

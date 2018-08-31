@@ -386,6 +386,11 @@
         //var socket = io.connect('http://159.65.96.228:3000');
 
         $('#myTabs a').click(function(e) {
+            /**********************************************************************************************************
+             * Funcion que se manda llamar cada vez que se selecciona una nueva tab y muestra la informacion de dicha *
+             * tab seleccionada                                                                                       *
+             * @param: e es el evento que mando llamar la funcion                                                     *
+             **********************************************************************************************************/
             e.preventDefault()
             $(this).tab('show')
         })
@@ -415,6 +420,10 @@
                      * Agregar plantas
                      */
                     $("#addPlantasForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega una nueva planta                                *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -440,6 +449,10 @@
                     });
 
                     $("#addAreasForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega una nueva area                                  *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -466,6 +479,10 @@
                     });
                     
                     $("#addMaquinasForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega una nueva maquina                               *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -494,6 +511,10 @@
                     });
 
                     $("#addRazonesParoForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega una nueva razon de paro                         *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -520,6 +541,10 @@
                     });
 
                     $("#addRazonesCalidadForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega una nueva razon de calidad                      *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -546,6 +571,10 @@
                     });
 
                     $("#addProductosForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega un nuevo producto                               *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -575,6 +604,10 @@
                     });
 
                     $("#addTurnosForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega un nuevo turno                                  *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -603,6 +636,10 @@
                     });
 
                     $("#addUsuariosForm").submit(function(event) {
+                        /**********************************************************
+                         * Agrega un nuevo usuario                                *
+                         * @param: event es el evento que mando llamar la funcion *
+                         **********************************************************/
                         // cancels the form submission
                         event.preventDefault();
 
@@ -643,6 +680,9 @@
    <script>
         $(document).ready(function() {
             $('#editar-plantas-<%= plantas[i].id %>').editable({
+                /********************
+                 * Edita una planta *
+                 ********************/
                 success: function(response, newValue) {
                     if (response.status == 'error') return response.msg; //msg will be shown in editable form
                 }
@@ -661,6 +701,9 @@
     <script>
          $(document).ready(function() {
              $('#editar-areas-<%= areas[i].id %>').editable({
+                 /********************
+                 * Edita una area    *
+                 *********************/
                  success: function(response, newValue) {
                      ///// TODO: Hay que agregar un refresh a la pagina cuando se actualizen siertas cosas, las que se necesite o se pueda
                      if (response.status == 'error') return response.msg; //msg will be shown in editable form
@@ -682,6 +725,9 @@
             // TODO: hay que verificar esta logica, porque no se van a poder modifircar el nombre de las maquinas si no hay productos. (sera correcto?)
             $(document).ready(function() {
                 $('#editar-maquinas-<%= maquinas[i].id %>').editable({
+                    /***********************************************
+                     * Edita una maquina y sus productos asignados *
+                     ***********************************************/
                     success: function(response, newValue) {
                         ///// TODO: Hay que agregar un refresh a la pagina cuando se actualizen siertas cosas, las que se necesite o se pueda
                         if (response.status == 'error') return response.msg; //msg will be shown in editable form
@@ -719,6 +765,9 @@
             // TODO: hay que verificar esta logica, porque no se van a poder modifircar el nombre de las razones si no hay maquinas. (sera correcto?)
             $(document).ready(function() {
                 $('#editar-razones-<%= razones[i].id %>').editable({
+                    /*************************************************
+                     * Edita una razon de paro y la maquina asignada *
+                     *************************************************/
                     success: function(response, newValue) {
                         ///// TODO: Hay que agregar un refresh a la pagina cuando se actualizen siertas cosas, las que se necesite o se pueda
                         if (response.status == 'error') return response.msg; //msg will be shown in editable form
@@ -757,6 +806,9 @@
             // TODO: hay que verificar esta logica, porque no se van a poder modifircar el nombre de las calidad si no hay maquinas. (sera correcto?)
             $(document).ready(function() {
                 $('#editar-calidad-<%= calidad[i].id %>').editable({
+                    /****************************************************
+                     * Edita una razon de calidad y la maquina asignada *
+                     ****************************************************/
                     success: function(response, newValue) {
                         ///// TODO: Hay que agregar un refresh a la pagina cuando se actualizen siertas cosas, las que se necesite o se pueda
                         if (response.status == 'error') return response.msg; //msg will be shown in editable form
@@ -805,6 +857,9 @@
                 }
 
                 $('#delete-plantas-<%= plantas[i].id %>').click(function(){
+                    /********************
+                     * Borra una planta *
+                     ********************/
                     var result = confirm("Quieres borrar: <%= plantas[i].nombre %>?");
                     if (result) {
                         console.log("se va a borrar :(");
@@ -845,6 +900,9 @@
                     }
                     
                     $('#delete-areas-<%= areas[i].id %>').click(function(){
+                        /********************
+                         * Borra una area   *
+                         ********************/
                         var result = confirm("Quieres borrar: <%= areas[i].nombre %>?");
                         if (result) {
                             console.log("se va a borrar :(");
@@ -885,6 +943,9 @@
                     }
                     
                     $('#delete-maquinas-<%= maquinas[i].id %>').click(function(){
+                        /********************
+                         * Borra una maquina   *
+                         ********************/
                         var result = confirm("Quieres borrar: <%= maquinas[i].nombre %>?");
                         if (result) {
                             console.log("se va a borrar :(");
@@ -929,6 +990,9 @@
                     }
                     
                     $('#delete-razones-<%= razones[i].id %>').click(function(){
+                        /***************************
+                         * Borra una razon de paro *
+                         ***************************/
                         var result = confirm("Quieres borrar: <%= razones[i].nombre %>?");
                         if (result) {
                             console.log("se va a borrar :(");
@@ -973,6 +1037,9 @@
                     }
                     
                     $('#delete-calidad-<%= calidad[i].id %>').click(function(){
+                        /******************************
+                         * Borra una razon de calidad *
+                         ******************************/
                         var result = confirm("Quieres borrar: <%= calidad[i].nombre %>?");
                         if (result) {
                             console.log("se va a borrar :(");
@@ -1017,6 +1084,9 @@
                     }
                     
                     $('#delete-productos-<%= productos[i].id %>').click(function(){
+                        /***************************
+                         * Borra un producto       *
+                         ***************************/
                         var result = confirm("Quieres borrar: <%= productos[i].nombre %>?");
                         if (result) {
                             console.log("se va a borrar :(");
@@ -1061,6 +1131,9 @@
                 }
                 
                 $('#delete-turnos-<%= turnos[i].id %>').click(function(){
+                    /***************************
+                     * Borra un turno          *
+                     ***************************/
                     var result = confirm("Quieres borrar: <%= turnos[i].nombre %>?");
                     if (result) {
                         console.log("se va a borrar :(");
@@ -1105,6 +1178,9 @@
                 }
                 
                 $('#delete-users-<%= users[i].id %>').click(function(){
+                    /***************************
+                     * Borra un turno          *
+                     ***************************/
                     var result = confirm("Quieres borrar: <%= users[i].username %>?");
                     if (result) {
                         console.log("se va a borrar :(");

@@ -16,42 +16,64 @@ var fs = require('fs')
   , Log = require('log')
   , log = new Log('debug', fs.createWriteStream('../logs/engine.log'));
 
-// Util para cuando se crea una nueva conexion en el pool
+
 promisePool.on('connection', function () {
+    /**************************************************************
+     * Mensaje que avisa que se creo una nueva conexion a el pool *
+     **************************************************************/
     console.log("Se creo una conexion al pool")
 //connection.query('SET SESSION auto_increment_increment=1') // TODO: ver si es necesario ponerle esto
 });
 
-
-// El pool emite un evento cuando una conexion es regresada al pool de conexiones para ser utilizada por otra conexion
 promisePool.on('release', function () {
+    /***********************************************************
+     * Mensaje que avisa que se libero una conexion a el pool  *
+     ***********************************************************/
     console.log('Connection released');
 });
 
-// ver cuando se adquirio una connexion del pool de conexiones
 promisePool.on('acquire', function () {
+    /************************************************************
+     * Mensaje que avisa que se adquirio una conexion a el pool *
+     ************************************************************/
     console.log('Connection acquired');
 });
 
 
-// define constructor function that gets `io` send to it
 module.exports = function(io) {
+    /**************************************************************
+     * Constructor de los sockets                                 *
+     * @param: io es la instancia de los sockets que se utilizara *
+     **************************************************************/
+
     // When a client connects, we note it in the console
     io.sockets.on('connection', function (socket) {
+        /******************************************************************
+         * Escribimos en la consola cuando un cliente se conecta          *
+         * @param: socket es la instancia de los sockets que se utilizara *
+         ******************************************************************/
         console.log('A client is connected!');
         socket.emit('message', 'alive');
         socket.emit('conectado', 'se conecto una tablet') // Hay que ver como casar la sesion para mandar el status de una sola tablet a la pagina web.
         
-        // When the server receives a “message” type signal from the client   
-        // Solo de prueba, esta parte tiene que ser eliminada al final
         socket.on('message', function (message) {
+            /******************************************************************************
+             * Escribimos en la consola cuando un cliente manda un mensaje                *
+             * Cuando el servidor reciba un mensaje del cliente se mostrara en la consola *
+             * Este socket es solo de prueba, se eliminara al final                       *
+             * @param: message es el mensaje del cliente                                  *
+             ******************************************************************************/
             socket.emit('message', 'alive');
             console.log('A client is speaking to me! They’re saying: ' + message);
         });
 
-        // Peticion de la configuracion de cada laptop
         // TODO: no mandarle el activo a jossie
         socket.on('config', function (message) {
+            /***********************************************************************************
+             * Peticion de configuracion de cada maquina                                       *
+             * @param: message es el mensaje del cliente                                       *
+             * @return regresa toda la configuracion necesario para poder configurar la tablet *
+             ***********************************************************************************/
 
             console.log('Peticion de configuración')
 
@@ -177,6 +199,11 @@ module.exports = function(io) {
 
         // TODO: Hay que hacer otro evento donde se guarde la calidad (hay que hablar esto con Jossie para ver si es posible o si utilizamos es mismo)
         socket.on('evento', function (message) {
+            /***********************************************************************************
+             * Socket que guarda un nuevo evento                                               *
+             * @param: message es el mensaje del cliente                                       *
+             * @return manda llamar al socket actualizar despues de guardar un nuevo evento    *
+             ***********************************************************************************/
             log.info('inicia socket.on evento');
             
             var evento = JSON.parse(message);
@@ -390,7 +417,11 @@ module.exports = function(io) {
 
         // When the server receives a “config” type signal from the client   
         socket.on('actualizar', function (message) {
-            
+            /***************************************************************************
+             * Socket que manda actualizar los clientes conectados                     *
+             * @param: message es el mensaje del cliente                               *
+             * @return manda actualizar los clientes conectados(tablets y servidor)    *
+             ***************************************************************************/
             log.info('Inicia - socket on actualizar')
 
             // Se obtiene fecha y hora
@@ -537,15 +568,24 @@ module.exports = function(io) {
                 });
             });
         });
-
-        // When the server receives a “config” type signal from the client   
+ 
         socket.on('register', function (message) {
             // TODO: Agregar el nombre del usuario que se conecto.
+            /**********************************************************************
+             * Socket que detecta que un cliente esta reciviendo la señal config  *
+             * @param: message es el mensaje del cliente                          *
+             * @return manda llamar al socket register                            *
+             **********************************************************************/
             socket.emit('register', 'ok');
         });
 
         socket.on('disconnect', (reason) => {
             // TODO: Detectar quien se desconecto y dejar de mandarle cosas a el
+            /****************************************************
+             * Socket que detecta que una tablet se desconecto  *
+             * @param: reason es el mensaje del cliente         *
+             * @return manda llamar al socket desconectado      *
+             ****************************************************/
             socket.emit('desconectado', "se desconecto una tablet")
         });
 
@@ -553,7 +593,11 @@ module.exports = function(io) {
         * Cambio de la planta seleccionada (Paginas que hacen reportes)
         */
         socket.on('cambio-planta', function (message) {
-            
+            /**********************************************************************************************************
+             * Socket que se utiliza cuando una pagina que hace un reporte cambia la planta seleccionada              *
+             * @param: message es el id de la planta seleccionada                                                     *
+             * @return manda llamar al socket cambio-planta y enviea los turnos, areas y productos de la nueva planta *
+             **********************************************************************************************************/
             var return_data = {}
             promisePool.getConnection().then(function(connection) {
                 connection.query("select * from turnos where activo = true and plantas_id = " + message).then(function(rows){
@@ -584,6 +628,11 @@ module.exports = function(io) {
         });
 
         socket.on('reporte-oee', function (json) {
+            /*********************************************************************************************************************************************************
+             * Socket que se utiliza cuando se genera un reporte                                                                                                     *
+             * @param: json es toda la informacion necesaria para hacer los querys(planta,area,turno,producto,fecha de inicio, fecha final, hora inicio, hora final) *
+             * @return devuelve toda la informacion necesaria para que los reportes puedan ser generados                                                             *
+             *********************************************************************************************************************************************************/
             log.info("llego un socket en reporte-oee");
 
             var planta = json.planta // all | id
@@ -797,7 +846,11 @@ module.exports = function(io) {
         })
 
         socket.on('digital1', function (message) {
-
+            /********************************************************************************************************
+             * Socket que se utiliza para guardar informacion en la tabla digital(es posible que este ya no se use) * 
+             * @param: message es el mensaje del cliente                                                            *
+             * @return manda llamar el socket digital1 de todos los clientes                                        *
+             ********************************************************************************************************/
             log.info('Digital 1 Recibido ' + message)
             var digital = JSON.parse(message);
 
@@ -862,7 +915,11 @@ module.exports = function(io) {
         });
 
         socket.on('digital2', function (message) {
-
+            /********************************************************************************************************
+             * Socket que se utiliza para guardar informacion en la tabla digital(es posible que este ya no se use) * 
+             * @param: message es el mensaje del cliente                                                            *
+             * @return manda llamar el socket digital2 de todos los clientes                                        *
+             ********************************************************************************************************/
             log.info('Digital 2 recibido ' + message)
 
             var digital = JSON.parse(message);
@@ -928,7 +985,11 @@ module.exports = function(io) {
         });
 
         socket.on('incremento1', function (message) {
-            
+            /***************************************************************************************************************************
+             * Socket que se utiliza para guardar un evento de que se genero una nueva pieza                                           * 
+             * @param: message es el mensaje del cliente                                                                               *
+             * @return manda llamar el socket evento-done con la operacion_uuid del evento que se guardo y a actualizar a los clientes *
+             ***************************************************************************************************************************/
             log.info('Incremento recibido: ' + message)
 
             var evento = JSON.parse(message);
@@ -1162,7 +1223,12 @@ module.exports = function(io) {
 
         // TODO: ver si se va a borrar este evento, ya que todos los incrementos (negativos y positivos) se reciben en el incremento 1
         socket.on('agregar-scrap', function (json) {
-
+            /*************************************************************************************************************
+             * Socket que se utiliza para guardar un evento de que se genero una nueva que no paso el control de calidad *
+             * Este socket ya no es utilizado                                                                            * 
+             * @param: json es el mensaje del cliente                                                                    *
+             * @return manda llamar el socket respuesta-scrap                                                            *
+             *************************************************************************************************************/
             log.info("Se recibio scrap " + json)
             var planta = json.planta // id
             var area = json.area // id
@@ -1237,10 +1303,14 @@ module.exports = function(io) {
             });
         });
 
+        /*************************************************************************************************
+         * Esta seccion es para las pruebas que se usaron en cedar logistics, se va a comentar y probara *
+         * para ver si se elimina toda esta seccion                                                      *
+         *************************************************************************************************/
         /*
         * Pruebas para Cedar Logistics
         */
-
+        /*
         // Mandar accounts
         socket.on('accounts', function (json) {
             var accounts = '{"users": [{"id": 1, "name": "Daniel", "password": "4rv1z0", "type": 1 }, {"id": 2, "name": "Roger", "password": "r0g3r", "type": 1 }, {"id": 3, "name": "Ricardo", "password": "R1c4rd0", "type": 2 }, {"id": 4, "name": "Miguel", "password": "sdasfg", "type": 2 }, {"id": 5, "name": "Nuvia", "password": "Nuvi4", "type": 3 }, {"id": 6, "name": "Carlos", "password": "Ch4rl1", "type": 3 }] }'
@@ -1281,6 +1351,7 @@ module.exports = function(io) {
         socket.on('status', function (json) {
           socket.emit('status', json);
         });
+        */
         
         // Aqui puedo ir agregando mas sockets
     });

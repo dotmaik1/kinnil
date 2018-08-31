@@ -109,6 +109,10 @@
         //var socket = io.connect('http://159.65.96.228:3000');
 
         function consultar(e) {
+            /*************************************************************************************************************
+             * Funcion que se manda llamar para hacer la peticion de informacion al servidor para generar un reporte     *
+             * @param: e es el evento que mando llamar la funcion                                                        *
+             *************************************************************************************************************/
             var e = window.event || e;
 	        var targ = e.target || e.srcElement;
 
@@ -142,6 +146,10 @@
         }
 
         function toPDF(e){
+            /********************************************************
+             * Funcion que se manda llamar para imprimir un reporte *
+             * @param: e es el evento que mando llamar la funcion   *
+             ********************************************************/
             var e = window.event || e;
 	        var targ = e.target || e.srcElement;
             e.preventDefault();
@@ -149,6 +157,10 @@
         }
 
         socket.on('reporte-oee', function(message) {
+            /*************************************************************************************************************
+             * Socket que se manda llamar para hacer la peticion de informacion al servidor para generar un reporte      *
+             * @param: message es un objeto con toda la informacion que provee el servidor                               *
+             *************************************************************************************************************/
 
             window.scroll({ top: 500, left: 0, behavior: 'smooth' }); // Scroll sencillo smooth
             
@@ -241,7 +253,9 @@
 
 
         $("#plantas-choice").change(function() { // Cada vez que se cambie de plantas
-
+            /****************************************************************
+             * Funcion que se manda llamar cada vez que se cambia la planta *
+             ****************************************************************/
             var $dropdown = $(this);
             var id = $dropdown.val();  // Se obtiene el ID de la planta seleccionada
 
@@ -259,8 +273,11 @@
 
 
         socket.on('cambio-planta', function(returnData) {
-
-
+            /********************************************************************************************************
+             * Socket que llega cuando se cambio la planta                                                          *
+             * @param: returnData es donde viene almacenado las areas, turnos y productos de la planta seleccionada *
+             ********************************************************************************************************/
+    
             // se vacian estos select inputs para agregar nuevos datos.
             var $areasChoice = $("#areas-choice");
             $areasChoice.empty();

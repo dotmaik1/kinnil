@@ -234,18 +234,28 @@
         
         
         socket.on('message', function(message) {
+           /*************************************************************
+            * Socket que se utiliza para probar la conexion al servidor *
+            *************************************************************/
             console.log('el server esta vivo');
         })
 
         var tid = setInterval(mycode, 15000);
         function mycode() {
+            /*********************************************************************************
+            * Funcion que manda llamar al servidor para actualizar el status de las maquinas *
+            **********************************************************************************/
             console.log("mande a actualizar");
             socket.emit('actualizar', "please"); // El mensaje enviado no es utilizado para la actualizacion.
         }
 
         socket.on('actualizar', function(message) {
-
-            function callEndpoint() {
+            /*************************************************************************
+            * Socket que manda el servidor para actualizar el status de las maquinas *
+            * @param: message es la informacion necesaria para actualizar            *
+            **************************************************************************/
+            
+            /*function callEndpoint() {
                 $.getJSON('/contador-digital/', function(data) {
                     
                     $('#digital1').html(data.rows[0].no_eventos);
@@ -253,7 +263,7 @@
 
                 });
             }
-            callEndpoint();
+            callEndpoint();*/
 
             
 
@@ -332,7 +342,11 @@
         var timer = new Timer();
 
         socket.on('digital1', function(message) {
-
+            /*************************************************************************
+             * Socket que manda el servidor para actualizar el #digital1             *
+             * Creo que este socket ya no se esta usando TODO: eliminarlo            * 
+             * @param: message es el mensaje del servidor                            *
+             *************************************************************************/
             //console.log("llego un evento digital1: " +message);
             message = JSON.parse(message);
 
@@ -364,7 +378,11 @@
         var timer2 = new Timer(); 
 
         socket.on('digital2', function(message) {
-
+            /*************************************************************************
+             * Socket que manda el servidor para actualizar el #digital2             *
+             * Creo que este socket ya no se esta usando TODO: eliminarlo            * 
+             * @param: message es el mensaje del servidor                            *
+             *************************************************************************/
             message = JSON.parse(message);
 
             function callEndpoint() {
@@ -396,10 +414,5 @@
 
    </script> 
    <%include ../partials/js %>
-   <script>
-       $(function() {
-            
-       });
-   </script>
 </body>
 </html>

@@ -303,6 +303,9 @@
         //var socket = io.connect('http://159.65.96.228:3000');
 
         socket.on('message', function(message) {
+            /*************************************************************
+            * Socket que se utiliza para probar la conexion al servidor *
+            *************************************************************/
             console.log('el server esta vivo');
         })
 
@@ -313,7 +316,10 @@
         }
 
         socket.on('actualizar', function(message) {
-
+            /*************************************************************************
+            * Socket que manda el servidor para actualizar el status de las maquinas *
+            * @param: message es la informacion necesaria para actualizar            *
+            **************************************************************************/
             console.log("actualizar evento");
             // Agrega color a la tabla que muestra el estatus
 

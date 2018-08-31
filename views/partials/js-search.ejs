@@ -7,18 +7,27 @@ var tipo = "turno"; // Por default es por turno para que aparesca algo aunque el
 document.getElementById('ifTurno').style.display = 'block'; // Hace que se despliegue las opciones de los turnos
 
 function byTurno() {
+    /*****************************************************************************
+    * Funcion que deja el tipo de busqueda por turno visible y esconde los demas *
+    ******************************************************************************/
     document.getElementById('ifTurno').style.display = 'block';
     document.getElementById('ifProducto').style.display = 'none';
     document.getElementById('ifHora').style.display = 'none';
     tipo = "turno";
 }
 function byProducto() {
+    /********************************************************************************
+    * Funcion que deja el tipo de busqueda por producto visible y esconde los demas *
+    *********************************************************************************/
     document.getElementById('ifTurno').style.display = 'none';
     document.getElementById('ifProducto').style.display = 'block';
     document.getElementById('ifHora').style.display = 'none';
     tipo = "producto";
 }
 function byHora() {
+   /******************************************************************************
+    * Funcion que deja el tipo de busqueda por hora visible y esconde los demas  *
+    ******************************************************************************/
     document.getElementById('ifTurno').style.display = 'none';
     document.getElementById('ifProducto').style.display = 'none';
     document.getElementById('ifHora').style.display = 'block';
@@ -26,6 +35,9 @@ function byHora() {
 }
 
 function bySixToSix() {
+    /*****************************************************************************
+    * Funcion esconde los tipos de busqueda                                     *
+    ******************************************************************************/
     document.getElementById('ifTurno').style.display = 'none';
     document.getElementById('ifProducto').style.display = 'none';
     document.getElementById('ifHora').style.display = 'none';
@@ -44,6 +56,11 @@ $(function() {
     var end = moment();
 
     function cb(start, end) {
+       /*************************************************************************************************************
+        * Funcion que asigna el valor de fechaInicio y fechaFin y tambien pone las fechas seleccionadas en un input *
+        * @param: start es la fecha inicio                                                                          *
+        * @param: end es la fecha final                                                                             *
+        *************************************************************************************************************/
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         fechaInicio = start;
         fechaFin = end;
