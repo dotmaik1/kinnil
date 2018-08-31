@@ -137,7 +137,9 @@
     console.log(tz[0].timezone); // Obtiene el timezone actual
         
     function saveTz() {
-
+        /************************************************************
+        * Funcion que muestra el timezone seleccionado              *
+        *************************************************************/
         var tz = $('.dropdown-toggle').data('timezonePicker').getValue();
 
             console.log(tz[0].timezone);
@@ -151,29 +153,47 @@
     
 
     socket.on('message', function(message) {
+        /*************************************************************
+        * Socket que se utiliza para probar la conexion al servidor *
+        *************************************************************/
         //alert('The server has a message for you: ' + message );
     })
 
     socket.on('evento', function(message) {
+        /****************************************************************
+        * Socket que se utiliza para el uuid del ultimo evento guardado *
+        *****************************************************************/
         alert('Este es el UUID que mandaste: ' + message);
     })
 
     // Esta funcion de aqui es de jquery
     $('#poke').click(function() {
+        /****************************************************************
+        * Funcion que envia un mensaje al servidor                      *
+        *****************************************************************/
         socket.emit('message', 'Hi server, how are you?');
     })
 
     // Esta funcion de aqui es de jquery
     $('#config').click(function() {
+        /****************************************************************
+        * Funcion que envia un mensaje al servidor                      *
+        *****************************************************************/
         socket.emit('config', 'all');
     })
 
     // Esta funcion de aqui es de jquery
     $('#encendido').click(function() {
+        /****************************************************************
+        * Funcion que envia un evento al servidor                       *
+        *****************************************************************/
         socket.emit('evento', '{"operacion_uuid":"UUID", "maquinas_id":1, "activo":true, "razones_id":1, "tiempo":300 }');
     })
 
     $('#apagado').click(function() {
+        /****************************************************************
+        * Funcion que envia un evento al servidor                       *
+        *****************************************************************/
         socket.emit('evento', '{"operacion_uuid":"UUID", "maquinas_id":1, "activo":false, "razones_id":2, "tiempo":300 }');
     })
    </script> <%include ../partials/js %>

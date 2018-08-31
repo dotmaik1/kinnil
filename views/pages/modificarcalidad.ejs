@@ -143,11 +143,16 @@
 
         
         socket.on('message', function(message) {
+            /*************************************************************
+            * Socket que se utiliza para probar la conexion al servidor *
+            *************************************************************/
             console.log('el server esta vivo');
         })
 
         function consultar() {
-            
+            /**********************************************************************
+             * Funcion que manda al servidor una scrap                            *
+             **********************************************************************/
             console.log("se consulto la calidad")
             var json = {}
 
@@ -165,6 +170,10 @@
         }
 
         socket.on('respuesta-scrap', function(message) {
+            /**********************************************************************
+             * Socket que manda el servidor cuando llega un scrap                 *
+             * @param: message es el mensaje de confirmacion de que se guardo     *
+             **********************************************************************/
             alert(message);
             //location.reload();
         })

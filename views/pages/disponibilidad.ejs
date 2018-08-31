@@ -168,6 +168,10 @@
         var json = {};
             
             function consultar(e) {
+            /*************************************************************************************************************
+             * Funcion que se manda llamar para hacer la peticion de informacion al servidor para generar un reporte     *
+             * @param: e es el evento que mando llamar la funcion                                                        *
+             *************************************************************************************************************/
                 var e = window.event || e;
 	            var targ = e.target || e.srcElement;
     
@@ -212,6 +216,12 @@
             });*/
             var JSONData = [];
             function JSONToCSVConvertor(ReportTitle, ShowLabel) {
+                
+            /*************************************************************************************
+             * Funcion que convierte un csv a un archivo de excel                                *
+             * @param: ReportTitle es el titulo del archivo                                      *
+             * @param: ShowLabel era parte del titulo del archivo, TODO: eliminar este parametro *
+             *************************************************************************************/
                 var CSV = '';    
                 //Set Report title in first row or line
                 CSV += ReportTitle + '\r\n\n';
@@ -330,6 +340,10 @@
             }
 
             function toPDF(e){
+                /********************************************************
+                 * Funcion que se manda llamar para imprimir un reporte *
+                 * @param: e es el evento que mando llamar la funcion   *
+                 ********************************************************/
                 var e = window.event || e;
 	            var targ = e.target || e.srcElement;
                 e.preventDefault();
@@ -337,7 +351,10 @@
             }
     
             socket.on('reporte-oee', function(message) {
-    
+                /*************************************************************************************************************
+                 * Socket que se manda llamar para hacer la peticion de informacion al servidor para generar un reporte      *
+                 * @param: message es un objeto con toda la informacion que provee el servidor                               *
+                 *************************************************************************************************************/
                 console.log("se recibio un evento de reporte-oee" );
                 console.log(message);
                 // TODO: agregar validaciones para cuando los valores sean nulos disponibilidad:[] rendimiento[] calidad[] se tiene que mostrar un mensaje al usuario o algo!
@@ -567,7 +584,9 @@
     
     
             $("#plantas-choice").change(function() { // Cada vez que se cambie de plantas
-    
+                /****************************************************************
+                 * Funcion que se manda llamar cada vez que se cambia la planta *
+                 ****************************************************************/
                 var $dropdown = $(this);
                 var id = $dropdown.val();  // Se obtiene el ID de la planta seleccionada
     
@@ -585,7 +604,10 @@
     
     
             socket.on('cambio-planta', function(returnData) {
-    
+                /********************************************************************************************************
+                 * Socket que llega cuando se cambio la planta                                                          *
+                 * @param: returnData es donde viene almacenado las areas, turnos y productos de la planta seleccionada *
+                 ********************************************************************************************************/
     
                 // se vacian estos select inputs para agregar nuevos datos.
                 var $areasChoice = $("#areas-choice");

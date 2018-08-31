@@ -17,11 +17,11 @@ var fs = require('fs')
   , log = new Log('debug', fs.createWriteStream('../logs/eventos.log')); // Secre un archivo para loguear informacion de errores
 
 
-/*
-* Obtiene la informacion del dashboard y se lo manda al ruteador (Inicio y Andon).
-*/
-exports.getDashboard = function(done) {
 
+exports.getDashboard = function(done) {
+    /***********************************************************************************
+    * Obtiene la informacion del dashboard y se lo manda al ruteador (Inicio y Andon). *
+    ************************************************************************************/
     log.info(' getDashboard fucntion called')
 
     var return_data = {}
@@ -209,10 +209,11 @@ exports.getDashboard = function(done) {
     });
 }
 
-/*
-* Obtiene la informacion necesaria para cargar los reportes y se lo manda al ruteador (disponibilidad, rendimiento, calidad y modificar calidad).
-*/
+
 exports.getReportesInfo = function(done) {
+    /**************************************************************************************************************************************************
+    * Obtiene la informacion necesaria para cargar los reportes y se lo manda al ruteador (disponibilidad, rendimiento, calidad y modificar calidad). *
+    ***************************************************************************************************************************************************/
     var return_data = {}
     // TODO: Aqui hay algo raro parece que no me esta regresando la informacion bien por que en la pagina no me aparece bien, checar
     promisePool.getConnection().then(function(connection) {
@@ -327,6 +328,9 @@ exports.getReportesInfo = function(done) {
 * TODO: unificar getModificarCalidad y getReportesInfo (son muy parecidos y tendrian que estar juntos) - codigo + facil de mantener!
 */
 exports.getModificarCalidad = function(done) {
+    /********************************************************************
+    * Obtiene la informacion necesaria para poder modificar la calidad. *
+    *********************************************************************/
     var return_data = {}
     promisePool.getConnection().then(function(connection) {
         // Primero obtiene el turno actual
@@ -418,10 +422,10 @@ exports.getModificarCalidad = function(done) {
     });
 }
 
-/*
-* Ontiene la configuracion y la manda al ruteador
-*/
 exports.getConfiguracion = function(done) {
+    /***************************************************************************************************
+    * Obtiene la informacion necesaria para poder cargar la pagina de configuracion areas,maquinas,etc *
+    ****************************************************************************************************/
     var return_data = {}
     promisePool.getConnection().then(function(connection) {
 
@@ -481,7 +485,11 @@ exports.getConfiguracion = function(done) {
 }
 
 exports.modificarNombrePlanta = function(pk, valor, done) {
-
+    /************************************************
+    * Modifica el nombre de la planta               *
+    * @param: pk es el id de la planta              *
+    * @param: valor es el nuevo nombre de la planta *
+    *************************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE plantas SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -497,7 +505,11 @@ exports.modificarNombrePlanta = function(pk, valor, done) {
 }
 
 exports.modificarNombreArea = function(pk, valor, done) {
-    
+    /**********************************************
+    * Modifica el nombre del area                 *
+    * @param: pk es el id de la area              *
+    * @param: valor es el nuevo nombre de la area *
+    ***********************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE areas SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -513,6 +525,11 @@ exports.modificarNombreArea = function(pk, valor, done) {
 }
 
 exports.modificarNombreMaquina = function(pk, valor, done) {
+    /*************************************************
+    * Modifica el nombre de una maquina              *
+    * @param: pk es el id de la maquina              *
+    * @param: valor es el nuevo nombre de la maquina *
+    **************************************************/
     
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE maquinas SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
@@ -529,7 +546,11 @@ exports.modificarNombreMaquina = function(pk, valor, done) {
 }
 
 exports.modificarProductoMaquina = function(pk, valor, done) {
-    
+    /********************************************
+    * Modifica el producto de una maquina       *
+    * @param: pk es el id de la maquina         *
+    * @param: valor es el nuevo id del producto *
+    *********************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE maquinas SET productos_id ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -548,9 +569,12 @@ exports.modificarProductoMaquina = function(pk, valor, done) {
 * Razones Paro
 */
 
-// Modifica el nombre de las razones de paro
 exports.modificarNombreRazonesParo = function(pk, valor, done) {
-
+    /******************************************
+    * Modifica el nombre de una razon de paro *
+    * @param: pk es el id de la razon de paro *
+    * @param: valor es el nuevo nombre        *
+    *******************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_paro SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -565,9 +589,12 @@ exports.modificarNombreRazonesParo = function(pk, valor, done) {
     });
 }
 
-// Modifica la maquina asignada a las razones de paro
 exports.modificarMaquinaRazonesParo = function(pk, valor, done) {
-    
+    /*********************************************
+    * Modifica la maquina de una razon de paro   *
+    * @param: pk es el id de la razon de paro    *
+    * @param: valor es el nuevo id de la maquina *
+    **********************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_paro SET maquinas_id ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -585,10 +612,12 @@ exports.modificarMaquinaRazonesParo = function(pk, valor, done) {
 /*
 * Razones Calidad
 */
-
-// Modifica el nombre de las razones de Calidad
 exports.modificarNombreRazonesCalidad = function(pk, valor, done) {
-
+    /***********************************************
+    * Modifica el nombre de una razon de calidad   *
+    * @param: pk es el id de la razon de calidad   *
+    * @param: valor es el nuevo nombre de la razon *
+    ************************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_calidad SET nombre ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -605,7 +634,11 @@ exports.modificarNombreRazonesCalidad = function(pk, valor, done) {
 
 // Modifica la maquina asignada a las razones de Calidad
 exports.modificarMaquinaRazonesCalidad = function(pk, valor, done) {
-    
+    /*********************************************************
+    * Modifica la maquina de una razon de calidad            *
+    * @param: pk es el id de la razon de calidad             *
+    * @param: valor es el id de la nueva maquina de la razon *
+    **********************************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_calidad SET maquinas_id ="' + valor + '" where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -621,7 +654,10 @@ exports.modificarMaquinaRazonesCalidad = function(pk, valor, done) {
 }
 
 exports.deletePlanta = function(pk, done) {
-    
+    /***************************************
+    * Modifica el active a 0 de una planta *
+    * @param: pk es el id de la planta     *
+    ****************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE plantas SET active = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -637,7 +673,10 @@ exports.deletePlanta = function(pk, done) {
 }
 
 exports.deleteArea = function(pk, done) {
-    
+    /*************************************
+    * Modifica el active a 0 de una area *
+    * @param: pk es el id de la area     *
+    **************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE areas SET active = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -653,7 +692,10 @@ exports.deleteArea = function(pk, done) {
 }
 
 exports.deleteMaquina = function(pk, done) {
-    
+    /****************************************
+    * Modifica el active a 0 de una maquina *
+    * @param: pk es el id de la maquina     *
+    *****************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE maquinas SET active = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -669,7 +711,10 @@ exports.deleteMaquina = function(pk, done) {
 }
 
 exports.deleteProducto = function(pk, done) {
-    
+    /****************************************
+    * Modifica el activo a 0 de un producto *
+    * @param: pk es el id del producto      *
+    *****************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE productos SET activo = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -684,11 +729,11 @@ exports.deleteProducto = function(pk, done) {
     });
 }
 
-/*
-* Borrar razones de paro
-*/
 exports.deleteRazonDeParo = function(pk, done) {
-    
+    /**********************************************
+    * Modifica el activo a 0 de una razon de paro *
+    * @param: pk es el id de la razon de paro     *
+    ***********************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_paro SET active = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -703,11 +748,11 @@ exports.deleteRazonDeParo = function(pk, done) {
     });
 }
 
-/*
-* Borrar razones de calidad
-*/
 exports.deleteRazonDeCalidad = function(pk, done) {
-    
+    /*************************************************
+    * Modifica el activo a 0 de una razon de calidad *
+    * @param: pk es el id de la razon de calidad     *
+    **************************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE razones_calidad SET activo = 0 where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -723,6 +768,10 @@ exports.deleteRazonDeCalidad = function(pk, done) {
 }
 
 exports.deleteTurno = function(pk, done) {
+    /*************************************
+    * Modifica el activo a 0 de un turno *
+    * @param: pk es el id de un turno    *
+    **************************************/
     
     promisePool.getConnection().then(function(connection) {
         connection.query('UPDATE turnos SET activo = 0 where id = ' + pk).then(function(rows){
@@ -739,7 +788,10 @@ exports.deleteTurno = function(pk, done) {
 }
 
 exports.deleteUsers= function(pk, done) {
-    
+    /**********************************
+    * Borra un usuario                *
+    * @param: pk es el id del usuario *
+    ***********************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('DELETE from users where id = ' + pk).then(function(rows){
                 promisePool.releaseConnection(connection);
@@ -907,7 +959,9 @@ exports.postConfiguracion = function(tipo, done) {
 
 
 exports.otro = function(valor, done) {
-    // cuando termine llama return done(null, return_data); o return done(err)
+    /**************************************************************************
+    * cuando termine llama return done(null, return_data); o return done(err) *
+    ***************************************************************************/
 }
 
 /*
@@ -915,7 +969,10 @@ exports.otro = function(valor, done) {
 */
 
 exports.contarEventos = function(razonParoId, done) {
-
+    /***********************************************************************************
+    * Cuenta la cantidad de veces que una maquina se ha detenido por una razon de paro *
+    * @param: razonParoId es el id de la razon de paro                                 *
+    ************************************************************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('select maquinas_id, count(*) no_reventones from eventos2 where razones_paro_id = ' + razonParoId + ' group by maquinas_id; ')
         .then(function(rows){
@@ -931,7 +988,9 @@ exports.contarEventos = function(razonParoId, done) {
 }
 
 exports.contadorDigital = function(done) {
-
+    /************************************************************************
+    * Este metodo ya no es usado debi a que la tabla digital ya no es usada *
+    *************************************************************************/
     promisePool.getConnection().then(function(connection) {
         connection.query('select d1.digital as digital, d1.activo as activo, d3.no_eventos \
                             from digital as d1 \
